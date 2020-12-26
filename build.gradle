@@ -6,70 +6,74 @@
  */
 plugins {
     id 'idea'
-    id 'java'
+//    id 'java'
     id 'scala'
     id 'application'
     id 'io.spring.dependency-management' version '1.0.10.RELEASE'
 }
 
-allprojects{
-	repositories {
-	    maven { url "https://maven.aliyun.com/repository/spring" }
-	    maven { url "https://maven.aliyun.com/repository/google" }
-	    maven { url "https://maven.aliyun.com/repository/public" }
-	    maven { url "https://maven.aliyun.com/repository/central" }
-	    maven { url "https://maven.aliyun.com/repository/jcenter" }
-	    maven { url "https://maven.aliyun.com/repository/releases" }
-	    maven { url "https://maven.aliyun.com/repository/spring-plugin" }
-	    maven { url "https://maven.aliyun.com/repository/gradle-plugin" }
-	}
+allprojects {
+    repositories {
+        maven { url "https://maven.aliyun.com/repository/spring" }
+        maven { url "https://maven.aliyun.com/repository/google" }
+        maven { url "https://maven.aliyun.com/repository/public" }
+        maven { url "https://maven.aliyun.com/repository/central" }
+        maven { url "https://maven.aliyun.com/repository/jcenter" }
+        maven { url "https://maven.aliyun.com/repository/releases" }
+        maven { url "https://maven.aliyun.com/repository/spring-plugin" }
+        maven { url "https://maven.aliyun.com/repository/gradle-plugin" }
+    }
 }
 
-subprojects{
-	apply plugin: 'idea'
-    apply plugin: 'java'
+dependencies {
+    implementation "org.scala-lang:scala-library:2.13.2"
+}
+
+subprojects {
+    apply plugin: 'idea'
+//    apply plugin: 'java'
     apply plugin: 'scala'
     apply plugin: 'application'
     apply plugin: 'io.spring.dependency-management'
 
-    ext{
-    	junitVersion='4.13'
-		log4jVersion='1.2.17'
-		slf4jversion='1.7.30'
-		redisVersion='3.4.0'
-		scalaVersion='2.13.2'
-		jblasVersion='1.2.5'
-		kafkaVersion='2.5.0'
-		hbaseVersion='2.2.5'
-		sparkVersion='3.0.0'
-    	guavaVersion='29.0-jre'
-    	lombokVersion='1.18.16'
-	}
-	
-	dependencies {
-		testImplementation "junit:junit:${junitVersion}"
-		implementation "org.slf4j:slf4j-log4j12:${slf4jversion}"
-		implementation "com.google.guava:guava:${guavaVersion}"
-		compileOnly "org.projectlombok:lombok:${lombokVersion}"
-		annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-		implementation "org.scala-lang:scala-library:${scalaVersion}"
+    ext {
+        junitVersion = '4.13'
+        log4jVersion = '1.2.17'
+        slf4jversion = '1.7.30'
+        redisVersion = '3.4.0'
+        scalaVersion = '2.13.2'
+        jblasVersion = '1.2.5'
+        kafkaVersion = '2.5.0'
+        hbaseVersion = '2.2.5'
+        sparkVersion = '3.0.0'
+        guavaVersion = '29.0-jre'
+        lombokVersion = '1.18.16'
+    }
 
-		// implementation "log4j:log4j:${log4j.version}"
-		// implementation "org.slf4j:jcl-over-slf4j:${slf4j.version}"
-		// implementation "org.slf4j:slf4j-api:${slf4j.version}"
-		// implementation "org.slf4j:slf4j-log4j12:${slf4j.version}"
-	}
+    dependencies {
+        testImplementation "junit:junit:${junitVersion}"
+        implementation "org.slf4j:slf4j-log4j12:${slf4jversion}"
+        implementation "com.google.guava:guava:${guavaVersion}"
+        compileOnly "org.projectlombok:lombok:${lombokVersion}"
+        annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+        //implementation "org.scala-lang:scala-library:${scalaVersion}"
 
-	dependencyManagement {
-	    dependencies {
-	        dependency "org.scala-lang:scala-library:${scalaVersion}"
-			dependency "org.apache.hbase:hbase-server:${hbaseVersion}"
-	    	dependency "org.apache.hbase:hbase-client:${hbaseVersion}"
-			dependency "org.apache.spark:spark-core_2.12:${sparkVersion}"
-			dependency "org.apache.spark:spark-sql_2.12:${sparkVersion}"
-			dependency "org.apache.spark:spark-streaming_2.12:${sparkVersion}"
-			dependency "org.apache.spark:spark-mllib_2.12:${sparkVersion}"
-			dependency "org.apache.spark:spark-graphx_2.12:${sparkVersion}"
-	    }
-	}
+        // implementation "log4j:log4j:${log4j.version}"
+        // implementation "org.slf4j:jcl-over-slf4j:${slf4j.version}"
+        // implementation "org.slf4j:slf4j-api:${slf4j.version}"
+        // implementation "org.slf4j:slf4j-log4j12:${slf4j.version}"
+    }
+
+    dependencyManagement {
+        dependencies {
+            dependency "org.scala-lang:scala-library:${scalaVersion}"
+            dependency "org.apache.hbase:hbase-server:${hbaseVersion}"
+            dependency "org.apache.hbase:hbase-client:${hbaseVersion}"
+            dependency "org.apache.spark:spark-core_2.12:${sparkVersion}"
+            dependency "org.apache.spark:spark-sql_2.12:${sparkVersion}"
+            dependency "org.apache.spark:spark-streaming_2.12:${sparkVersion}"
+            dependency "org.apache.spark:spark-mllib_2.12:${sparkVersion}"
+            dependency "org.apache.spark:spark-graphx_2.12:${sparkVersion}"
+        }
+    }
 }
