@@ -37,7 +37,7 @@ subprojects {
         log4jVersion = '1.2.17'
         slf4jversion = '1.7.30'
         redisVersion = '3.4.0'
-        scalaVersion = '2.13.2'
+        scalaVersion = '2.12.12'
         jblasVersion = '1.2.5'
         kafkaVersion = '2.5.0'
         hbaseVersion = '2.2.5'
@@ -52,7 +52,7 @@ subprojects {
         implementation "com.google.guava:guava:${guavaVersion}"
         compileOnly "org.projectlombok:lombok:${lombokVersion}"
         annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-        //implementation "org.scala-lang:scala-library:${scalaVersion}"
+        implementation "org.scala-lang:scala-library:${scalaVersion}"
 
         // implementation "log4j:log4j:${log4j.version}"
         // implementation "org.slf4j:jcl-over-slf4j:${slf4j.version}"
