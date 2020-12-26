@@ -1,7 +1,11 @@
 package com.zhujiejun.recomder
 
 import com.zhujiejun.recomder.cons.Const._
+import com.zhujiejun.recomder.data.{Movie, Rating, Tag}
 import com.zhujiejun.recomder.util.HBaseUtil
+import org.apache.commons.lang3.RandomStringUtils
+import org.apache.spark.SparkConf
+import org.apache.spark.sql.SparkSession
 
 object App000 {
     def storeDataInHabse(rowKey: String, columnFamily: String, column: String, value: String): Unit = {
@@ -11,7 +15,7 @@ object App000 {
         HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, columnFamily, column, value)
     }
 
-    /*def main(args: Array[String]): Unit = {
+    def main(args: Array[String]): Unit = {
         val sparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_001_NAME)
         val spark = SparkSession.builder().config(sparkConf).getOrCreate()
 
@@ -23,7 +27,7 @@ object App000 {
         }).toDF()
         movieDF.foreach(row => {
             val rowKey = RandomStringUtils.randomAlphanumeric(18)
-            for (i <- 0 to 10) {
+            for (i <- 0 to 9) {
                 storeDataInHabse(rowKey, HBASE_MOVIE_COLUMN_FAMILY, MOVIE_fIELD_MAP(i), row.get(i).toString)
             }
         })
@@ -41,9 +45,5 @@ object App000 {
         }).toDF()
 
         spark.stop()
-    }*/
-
-    def main(args: Array[String]): Unit = {
-        0 to 10 foreach println
     }
 }
