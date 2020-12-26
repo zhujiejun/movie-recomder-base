@@ -8,3 +8,9 @@
  */
 
 rootProject.name = 'movie-recomder-base'
+include 'service-000'
+include 'service-001'
+include 'service-002'
+include 'service-003'
+include 'service-004'
+include 'service-005'

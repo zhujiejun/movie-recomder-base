@@ -1,0 +1,9 @@
+project(':service-000') {
+    dependencies {
+        implementation 'org.apache.hbase:hbase-server'
+        implementation 'org.apache.hbase:hbase-client'
+        implementation 'org.apache.spark:spark-core_2.12'
+        implementation 'org.apache.spark:spark-sql_2.12'
+    }
+}
+mainClassName = 'com.zhujiejun.recomder.App000'
