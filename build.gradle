@@ -6,7 +6,7 @@
  */
 plugins {
     id 'idea'
-//    id 'java'
+    id 'java'
     id 'scala'
     id 'application'
     id 'io.spring.dependency-management' version '1.0.10.RELEASE'
@@ -25,13 +25,9 @@ allprojects {
     }
 }
 
-dependencies {
-    implementation "org.scala-lang:scala-library:2.13.2"
-}
-
 subprojects {
     apply plugin: 'idea'
-//    apply plugin: 'java'
+    apply plugin: 'java'
     apply plugin: 'scala'
     apply plugin: 'application'
     apply plugin: 'io.spring.dependency-management'
