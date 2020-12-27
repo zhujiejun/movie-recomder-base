@@ -18,9 +18,9 @@ object App000 {
         val sparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_001_NAME)
         sparkConf
             .set("spark.driver.cores", "6")
-            .set("spark.driver.memory", "300m")
+            .set("spark.driver.memory", "512m")
             .set("spark.executor.cores", "6")
-            .set("spark.executor.memory", "480m") //>=450m
+            .set("spark.executor.memory", "512m") //>=450m
             .set("spark.submit.deployMode", "cluster")
         val spark = SparkSession.builder().config(sparkConf).getOrCreate()
 
