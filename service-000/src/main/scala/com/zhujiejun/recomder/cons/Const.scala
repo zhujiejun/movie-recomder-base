@@ -4,9 +4,10 @@ object Const {
     val SERVICE_001_NAME = "DataLoader"
     val SERVICE_002_NAME = "xxxx"
 
-    //val MOVIE_DATA_PATH = "/home/cat/Downloads/common/movies.csv"
-    //val RATING_DATA_PATH = "/home/cat/Downloads/common/ratings.csv"
-    //val TAG_DATA_PATH = "/home/cat/Downloads/common/tags.csv"
+    /*val MOVIE_DATA_PATH = "/home/cat/Downloads/common/movies.csv"
+    val RATING_DATA_PATH = "/home/cat/Downloads/common/ratings.csv"
+    val TAG_DATA_PATH = "/home/cat/Downloads/common/tags.csv"*/
+
     val MOVIE_DATA_PATH = "/home/cat/movies.csv"
     val RATING_DATA_PATH = "/home/cat/ratings.csv"
     val TAG_DATA_PATH = "/home/cat/tags.csv"
