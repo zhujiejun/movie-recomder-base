@@ -17,6 +17,12 @@ object App000 {
 
     def main(args: Array[String]): Unit = {
         val sparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_001_NAME)
+        sparkConf
+            .set("spark.driver.cores", "6")
+            .set("spark.driver.memory", "512m")
+            .set("spark.executor.cores", "6")
+            .set("spark.executor.memory", "512m")
+            .set("spark.submit.deployMode", "cluster")
         val spark = SparkSession.builder().config(sparkConf).getOrCreate()
 
         import spark.implicits._
@@ -28,7 +34,8 @@ object App000 {
         movieDF.foreach(row => {
             val rowKey = RandomStringUtils.randomAlphanumeric(18)
             for (i <- 0 to 9) {
-                storeDataInHabse(rowKey, HBASE_MOVIE_COLUMN_FAMILY, MOVIE_fIELD_MAP(i), row.get(i).toString)
+                //storeDataInHabse(rowKey, HBASE_MOVIE_COLUMN_FAMILY, MOVIE_fIELD_MAP(i), row.get(i).toString)
+                println(s"----------column:${MOVIE_fIELD_MAP(i)}  value: ${row.get(i)}----------")
             }
         })
 
