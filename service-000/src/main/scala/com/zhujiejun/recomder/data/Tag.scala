@@ -8,4 +8,5 @@ package com.zhujiejun.recomder.data
  * dentist,
  * 1193435061
  */
-case class Tag(uid: Int, mid: Int, tag: String, timestamp: Int)
+@SerialVersionUID(1003L)
+case class Tag(uid: Int, mid: Int, tag: String, timestamp: Int) extends Serializable

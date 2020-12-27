@@ -8,4 +8,5 @@ package com.zhujiejun.recomder.data
 * 2.5,
 * 1260759144
 */
-case class Rating(uid: Int, mid: Int, score: Double, timestamp: Int)
+@SerialVersionUID(1002L)
+case class Rating(uid: Int, mid: Int, score: Double, timestamp: Int) extends Serializable

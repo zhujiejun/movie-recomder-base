@@ -15,4 +15,7 @@ package com.zhujiejun.recomder.data
  * George Lucas                                导演，directors
  *
  */
-case class Movie(mid: Int, name: String, descri: String, timelong: String, issue: String, shoot: String, language: String, genres: String, actors: String, directors: String)
+@SerialVersionUID(1001L)
+case class Movie(mid: Int, name: String, descri: String, timelong: String,
+                 issue: String, shoot: String, language: String,
+                 genres: String, actors: String, directors: String) extends Serializable
