@@ -35,8 +35,9 @@ object App000 {
             val rowKey = RandomStringUtils.randomAlphanumeric(18)
             for (i <- 0 to 9) {
                 //storeDataInHabse(rowKey, HBASE_MOVIE_COLUMN_FAMILY, MOVIE_fIELD_MAP(i), row.get(i).toString)
-                println(s"----------column:${MOVIE_fIELD_MAP(i)}  value: ${row.get(i)}----------")
+                println(s"----------column: ${MOVIE_fIELD_MAP(i)}, value: ${row.get(i).toString}----------")
             }
+            println()
         })
 
         val ratingRDD = spark.sparkContext.textFile(RATING_DATA_PATH)
