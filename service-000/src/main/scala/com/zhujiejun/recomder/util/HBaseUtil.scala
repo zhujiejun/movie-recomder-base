@@ -12,6 +12,7 @@ import org.slf4j.{Logger, LoggerFactory}
 
 import java.util
 import scala.collection.JavaConversions._
+import scala.collection.mutable.ListBuffer
 
 @SuppressWarnings(Array("unused", "deprecation"))
 object HBaseUtil {
@@ -139,15 +140,16 @@ object HBaseUtil {
     //获取指定"列族:列"的数据Movie
     @throws[Throwable]
     def getMoviesFromHbase(tableName: String, family: String): List[Movie] = {
-        val movies: List[Movie] = List()
+        val movies: ListBuffer[Movie] = new ListBuffer[Movie]
         val table = CONNECTION.getTable(TableName.valueOf(tableName))
         val resultScanner = table.getScanner(Bytes.toBytes(family))
         resultScanner.foreach { result =>
             val cells = result.rawCells()
+            var movieMap: Map[String, String] = Map()
             cells.foreach { cell => {
-                var movieMap: Map[String, String] = Map()
                 val column = Bytes.toString(CellUtil.cloneQualifier(cell))
                 val value = Bytes.toString(CellUtil.cloneValue(cell))
+                println(s"----------the column: $column  and value: $value----------")
                 column match {
                     case "mid" => movieMap += ("mid" -> value)
                     case "name" => movieMap += ("name" -> value)
@@ -161,26 +163,27 @@ object HBaseUtil {
                     case "directors" => movieMap += ("directors" -> value)
                     case _ => ""
                 }
-                val movie = Movie(movieMap("mid").toInt, movieMap("name"), movieMap("descri"),
-                    movieMap("timelong"), movieMap("issue"), movieMap("shoot"), movieMap("language"),
-                    movieMap("genres"), movieMap("actors"), movieMap("directors"))
-                movies.+:(movie)
             }
             }
+            println
+            val movie = Movie(movieMap("mid").toInt, movieMap("name"), movieMap("descri"),
+                movieMap("timelong"), movieMap("issue"), movieMap("shoot"), movieMap("language"),
+                movieMap("genres"), movieMap("actors"), movieMap("directors"))
+            movies.append(movie)
         }
-        movies
+        movies.toList
     }
 
     //获取指定"列族:列"的数据Rating
     @throws[Throwable]
     def getRatingsFromHbase(tableName: String, family: String): List[Rating] = {
-        val ratings: List[Rating] = List()
+        val ratings: ListBuffer[Rating] = new ListBuffer[Rating]
         val table = CONNECTION.getTable(TableName.valueOf(tableName))
         val resultScanner = table.getScanner(Bytes.toBytes(family))
         resultScanner.foreach { result =>
             val cells = result.rawCells()
+            var ratingMap: Map[String, String] = Map()
             cells.foreach { cell => {
-                var ratingMap: Map[String, String] = Map()
                 val column = Bytes.toString(CellUtil.cloneQualifier(cell))
                 val value = Bytes.toString(CellUtil.cloneValue(cell))
                 column match {
@@ -188,14 +191,14 @@ object HBaseUtil {
                     case "mid" => ratingMap += ("mid" -> value)
                     case "score" => ratingMap += ("score" -> value)
                     case "timestamp" => ratingMap += ("timestamp" -> value)
-                    case _ => println
+                    case _ => ""
                 }
-                val rating = Rating(ratingMap("uid").toInt, ratingMap("mid").toInt, ratingMap("score").toDouble, ratingMap("timestamp").toInt)
-                ratings.+:(rating)
             }
             }
+            val rating = Rating(ratingMap("uid").toInt, ratingMap("mid").toInt, ratingMap("score").toDouble, ratingMap("timestamp").toInt)
+            ratings.append(rating)
         }
-        ratings
+        ratings.toList
     }
 
     def checkTableExistInHabse(): Unit = {
