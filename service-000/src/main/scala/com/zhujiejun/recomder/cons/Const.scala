@@ -4,6 +4,7 @@ object Const {
     val SERVICE_001_NAME = "DataLoader"
     val SERVICE_002_NAME = "xxxx"
 
+    val DRIVER_PATH = "/home/cat/service-000/lib/service-000.jar"
     val MOVIE_DATA_PATH = "/home/cat/Downloads/common/movies.csv"
     val RATING_DATA_PATH = "/home/cat/Downloads/common/ratings.csv"
     val TAG_DATA_PATH = "/home/cat/Downloads/common/tags.csv"
@@ -11,8 +12,6 @@ object Const {
     /*val MOVIE_DATA_PATH = "/home/cat/movies.csv"
     val RATING_DATA_PATH = "/home/cat/ratings.csv"
     val TAG_DATA_PATH = "/home/cat/tags.csv"*/
-
-    val DRIVER_PATH = "/home/cat/service-000/lib/service-000.jar"
 
     val HBASE_ZOOKEEPER_QUORUM = "node101"
     val hbase_zookeeper_property_clientport = "2181"

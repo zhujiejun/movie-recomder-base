@@ -1,5 +1,6 @@
 package com.zhujiejun.recomder.util
 
+import com.google.common.collect.Lists
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.util.Bytes
@@ -8,7 +9,6 @@ import org.slf4j.{Logger, LoggerFactory}
 
 import java.util
 import scala.collection.JavaConversions._
-//import scala.collection.JavaConverters._
 
 @SuppressWarnings(Array("unused", "deprecation"))
 object HBaseUtil {
@@ -45,7 +45,8 @@ object HBaseUtil {
     def createTable(tableName: String, columnFamily: String*): Unit = {
         if (isTableExist(tableName)) log.info("----------table {} existed----------", tableName)
         else {
-            val columnFamilies: List[ColumnFamilyDescriptor] = List()
+            //val list: java.util.List[Int] = List(1,2,3,4).asJava
+            val columnFamilies: java.util.List[ColumnFamilyDescriptor] = Lists.newArrayList()
             for (sf <- columnFamily) {
                 columnFamilies.add(ColumnFamilyDescriptorBuilder.of(sf))
                 //columnFamilies :+ ColumnFamilyDescriptorBuilder.of(sf)
