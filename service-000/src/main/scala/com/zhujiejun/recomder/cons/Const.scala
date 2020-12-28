@@ -50,4 +50,6 @@ object Const {
     val OFFLINE_MOVIE_TABLE_NAME = "sfb_offline"
     val USER_RECS_COLUMN_FAMILY = "user-recs"
     val MOVIE_RECS_COLUMN_FAMILY = "movie-recs"
+
+    //----------the result is (300,0.1,0.9074302725757746)----------
 }

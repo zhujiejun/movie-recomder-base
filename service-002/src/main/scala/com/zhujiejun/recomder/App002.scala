@@ -40,7 +40,8 @@ object App002 {
         val movieRDD = ratingRDD.map(_._2).distinct()
         //训练隐语义模型
         val trainData = ratingRDD.map(x => MLRating(x._1, x._2, x._3))
-        val (rank, iterations, lambda) = (200, 5, 0.1)
+        //val (rank, iterations, lambda) = (200, 5, 0.1)
+        val (rank, iterations, lambda) = (300, 5, 0.9074302725757746)
         val model = ALS.train(trainData, rank, iterations, lambda)
         //基于用户和电影的隐特征，计算预测评分，得到用户的推荐列表
         //计算user和movie的笛卡尔积，得到一个空评分矩阵
