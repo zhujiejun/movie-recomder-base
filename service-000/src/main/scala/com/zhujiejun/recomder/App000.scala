@@ -36,6 +36,8 @@ object App000 {
 
         //import spark.implicits._
         //val movieSearch = new MovieSearch()
+        checkTableExistInHabse(HBASE_MOVIE_COLUMN_FAMILY, HBASE_RATING_COLUMN_FAMILY, HBASE_TAG_COLUMN_FAMILY)
+
         val movie = spark.sparkContext.textFile(MOVIE_DATA_PATH)
         implicit val movieRDD: RDD[Movie] = movie.map(item => {
             val attr = item.split("\\^")
@@ -64,7 +66,7 @@ object App000 {
             })
         }
 
-        storeMovieDataInHabse(HBASE_MOVIE_COLUMN_FAMILY)
+        storeMovieDataInHabse
 
         val rating = spark.sparkContext.textFile(RATING_DATA_PATH)
         implicit val ratingRDD: RDD[Rating] = rating.map(item => {
@@ -87,7 +89,7 @@ object App000 {
             })
         }
 
-        storeRatingDataInHabse(HBASE_RATING_COLUMN_FAMILY)
+        storeRatingDataInHabse
 
         val tag = spark.sparkContext.textFile(TAG_DATA_PATH)
         implicit val tagRDD: RDD[Tag] = tag.map(item => {
@@ -110,7 +112,7 @@ object App000 {
             })
         }
 
-        storeTagDataInHabse(HBASE_TAG_COLUMN_FAMILY)
+        storeTagDataInHabse
 
         spark.stop()
     }

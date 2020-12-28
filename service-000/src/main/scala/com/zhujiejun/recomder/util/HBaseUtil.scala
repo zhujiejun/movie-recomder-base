@@ -136,28 +136,27 @@ object HBaseUtil {
         }
     }
 
-    def checkTableExistInHabse(columnFamily: String): Unit = {
+    def checkTableExistInHabse(columnFamily: String*): Unit = {
         if (!HBaseUtil.isTableExist(HBASE_MOVIE_TABLE_NAME)) {
             println(s"----------the table $HBASE_MOVIE_TABLE_NAME  not existed, create the table----------")
-            HBaseUtil.createTable(HBASE_MOVIE_TABLE_NAME, columnFamily)
+            for (CF <- columnFamily) {
+                HBaseUtil.createTable(HBASE_MOVIE_TABLE_NAME, CF)
+            }
         }
     }
 
     //Movie
-    def storeMovieDataInHabse(columnFamily: String)(implicit data: RDD[Movie], save: RDD[Movie] => Unit): Unit = {
-        checkTableExistInHabse(columnFamily)
+    def storeMovieDataInHabse(implicit data: RDD[Movie], save: RDD[Movie] => Unit): Unit = {
         save(data)
     }
 
     //Rating
-    def storeRatingDataInHabse(columnFamily: String)(implicit data: RDD[Rating], save: RDD[Rating] => Unit): Unit = {
-        checkTableExistInHabse(columnFamily)
+    def storeRatingDataInHabse(implicit data: RDD[Rating], save: RDD[Rating] => Unit): Unit = {
         save(data)
     }
 
     //Tag
-    def storeTagDataInHabse(columnFamily: String)(implicit data: RDD[Tag], save: RDD[Tag] => Unit): Unit = {
-        checkTableExistInHabse(columnFamily)
+    def storeTagDataInHabse(implicit data: RDD[Tag], save: RDD[Tag] => Unit): Unit = {
         save(data)
     }
 
