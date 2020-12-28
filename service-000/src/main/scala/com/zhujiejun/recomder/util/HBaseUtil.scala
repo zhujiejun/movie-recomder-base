@@ -149,7 +149,7 @@ object HBaseUtil {
             cells.foreach { cell => {
                 val column = Bytes.toString(CellUtil.cloneQualifier(cell))
                 val value = Bytes.toString(CellUtil.cloneValue(cell))
-                println(s"----------the column: $column  and value: $value----------")
+                //println(s"----------the column: $column  and value: $value----------")
                 column match {
                     case "mid" => movieMap += ("mid" -> value)
                     case "name" => movieMap += ("name" -> value)

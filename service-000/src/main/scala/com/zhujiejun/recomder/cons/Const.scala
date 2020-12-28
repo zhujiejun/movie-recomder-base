@@ -25,8 +25,7 @@ object Const {
     val HBASE_RATING_COLUMN_FAMILY = "sfb_original_rating"
     val HBASE_TAG_COLUMN_FAMILY = "sfb_original_tag"
 
-    val MOVIE_fIELD_NAMES = List("mid", "name", "descri", "timelong",
-        "issue", "shoot", "language", "genres", "actors", "directors")
+    val MOVIE_fIELD_NAMES = List("mid", "name", "descri", "timelong", "issue", "shoot", "language", "genres", "actors", "directors")
     val RATING_fIELD_NAMES = List("uid", "mid", "score", "timestamp")
     val TAG_fIELD_NAMES = List("uid", "mid", "tag", "timestamp")
 
