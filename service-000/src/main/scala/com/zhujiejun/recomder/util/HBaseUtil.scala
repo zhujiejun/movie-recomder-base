@@ -223,7 +223,7 @@ object HBaseUtil {
 
     def main(args: Array[String]): Unit = {
         //System.out.println(HBaseUtil.isTableExist("sfb_base"))
-        HBaseUtil.getMoviesFromHbase("sfb_original", "sfb_original_movie").foreach { movie =>
+        HBaseUtil.getMoviesFromHbase(HBASE_MOVIE_TABLE_NAME, HBASE_MOVIE_COLUMN_FAMILY).foreach { movie =>
             println(s"---------the current movie is ${movie.toString}---------")
         }
     }
