@@ -16,14 +16,14 @@ object Const {
     val HBASE_ZOOKEEPER_QUORUM = "node101"
     val hbase_zookeeper_property_clientport = "2181"
 
+    val CONFIG = Map(
+        "spark.cores" -> "local[*]"
+    )
+
     val HBASE_MOVIE_TABLE_NAME = "sfb_original"
     val HBASE_MOVIE_COLUMN_FAMILY = "sfb_original_movie"
     val HBASE_RATING_COLUMN_FAMILY = "sfb_original_rating"
     val HBASE_TAG_COLUMN_FAMILY = "sfb_original_tag"
-
-    val CONFIG = Map(
-        "spark.cores" -> "local[*]"
-    )
 
     val MOVIE_fIELD_NAMES = List("mid", "name", "descri", "timelong",
         "issue", "shoot", "language", "genres", "actors", "directors")
@@ -32,10 +32,10 @@ object Const {
 
     //统计的表的名称
     val STATIC_MOVIE_TABLE_NAME = "sfb_static"
-    val RATE_MORE_MOVIES = "rate-more-movies"
-    val RATE_MORE_RECENTLY_MOVIES = "rate-more-recently-movies"
-    val AVERAGE_MOVIES = "average-movies"
-    val GENRES_TOP_MOVIES = "genres-top-movies"
+    val RATE_MORE_MOVIES_COLUMN_FAMILY = "rate-more-movies"
+    val RATE_MORE_RECENTLY_MOVIES_COLUMN_FAMILY = "rate-more-recently-movies"
+    val AVERAGE_MOVIES_COLUMN_FAMILY = "average-movies"
+    val GENRES_TOP_MOVIES_COLUMN_FAMILY = "genres-top-movies"
 
     val RATE_MORE_MOVIES_fIELD_NAMES = List("mid", "count")
     val RATE_MORE_RECENTLY_MOVIES_fIELD_NAMES = List("mid", "count", "yearmonth")

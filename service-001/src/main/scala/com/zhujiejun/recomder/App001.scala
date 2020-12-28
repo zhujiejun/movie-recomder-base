@@ -26,13 +26,13 @@ object App001 {
 
         import spark.implicits._
         val movies: List[Movie] = HBaseUtil.getMoviesFromHbase(HBASE_MOVIE_TABLE_NAME, HBASE_MOVIE_COLUMN_FAMILY)
-        val movieDS = spark.sparkContext.parallelize(movies).toDS()
+        val movieDF = spark.sparkContext.parallelize(movies).toDF()
 
         val ratings: List[Rating] = HBaseUtil.getRatingsFromHbase(HBASE_MOVIE_TABLE_NAME, HBASE_RATING_COLUMN_FAMILY)
-        val ratingDS = spark.sparkContext.parallelize(ratings).toDS()
+        val ratingDF = spark.sparkContext.parallelize(ratings).toDF()
 
         //创建名为ratings_tmp的临时表
-        ratingDS.createOrReplaceTempView("ratings_tmp")
+        ratingDF.createOrReplaceTempView("ratings_tmp")
 
         //不同的统计推荐结果
         //1.历史热门统计,历史评分数据最多,mid,count
@@ -46,7 +46,7 @@ object App001 {
                     case "count" => item.get(1).toString
                     case _ => ""
                 }
-                HBaseUtil.addRowData(STATIC_MOVIE_TABLE_NAME, rowKey, RATE_MORE_MOVIES, k, v)
+                HBaseUtil.addRowData(STATIC_MOVIE_TABLE_NAME, rowKey, RATE_MORE_MOVIES_COLUMN_FAMILY, k, v)
             }
         }
 
@@ -71,7 +71,7 @@ object App001 {
                     case "yearmonth" => item.get(3).toString
                     case _ => ""
                 }
-                HBaseUtil.addRowData(STATIC_MOVIE_TABLE_NAME, rowKey, RATE_MORE_RECENTLY_MOVIES, k, v)
+                HBaseUtil.addRowData(STATIC_MOVIE_TABLE_NAME, rowKey, RATE_MORE_RECENTLY_MOVIES_COLUMN_FAMILY, k, v)
             }
         }
 
@@ -86,7 +86,7 @@ object App001 {
                     case "avg" => item.get(1).toString
                     case _ => ""
                 }
-                HBaseUtil.addRowData(STATIC_MOVIE_TABLE_NAME, rowKey, AVERAGE_MOVIES, k, v)
+                HBaseUtil.addRowData(STATIC_MOVIE_TABLE_NAME, rowKey, AVERAGE_MOVIES_COLUMN_FAMILY, k, v)
             }
         }
 
@@ -96,7 +96,7 @@ object App001 {
             "Drama", "Family", "Fantasy", "Foreign", "History", "Horror", "Music", "Mystery",
             "Romance", "Science", "Tv", "Thriller", "War", "Western")
         //把平均评分加入movie表里,加一列,inner join
-        val movieWithScoreDF = movieDS.join(averageMoviesDF.toDF(), "mid")
+        val movieWithScoreDF = movieDF.join(averageMoviesDF.toDF(), "mid")
         //为做笛卡尔积，把genres转成rdd
         val genresRDD = spark.sparkContext.makeRDD(genres)
         //计算类别top10,首先对类别和电影做笛卡尔积
@@ -121,7 +121,7 @@ object App001 {
                     case "score" => item.get(1).toString
                     case _ => ""
                 }
-                HBaseUtil.addRowData(STATIC_MOVIE_TABLE_NAME, rowKey, AVERAGE_MOVIES, k, v)
+                HBaseUtil.addRowData(STATIC_MOVIE_TABLE_NAME, rowKey, AVERAGE_MOVIES_COLUMN_FAMILY, k, v)
             }
         }
 
