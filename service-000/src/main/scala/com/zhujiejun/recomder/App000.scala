@@ -1,10 +1,29 @@
 package com.zhujiejun.recomder
 
 import com.zhujiejun.recomder.cons.Const._
-import com.zhujiejun.recomder.data.{Movie, SearchMovie}
+import com.zhujiejun.recomder.data.{Movie, Rating, Tag}
 import com.zhujiejun.recomder.util.HBaseUtil
 import org.apache.spark.SparkConf
+import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
+
+case class SearchMovie() {
+    def getFilterMovieRDD(rdd: RDD[Movie]): RDD[Movie] = {
+        rdd.distinct()
+    }
+}
+
+case class SearchRating() {
+    def getFilterRatingRDD(rdd: RDD[Rating]): RDD[Rating] = {
+        rdd.distinct()
+    }
+}
+
+case class SearchTag() {
+    def getFilterRatingRDD(rdd: RDD[Tag]): RDD[Tag] = {
+        rdd.distinct()
+    }
+}
 
 object App000 {
     def storeDataInHabse(rowKey: String, columnFamily: String, column: String, value: String): Unit = {

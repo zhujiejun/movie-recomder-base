@@ -12,9 +12,3 @@ import org.apache.spark.rdd.RDD
  */
 @SerialVersionUID(1002L)
 case class Rating(uid: Int, mid: Int, score: Double, timestamp: Int) extends Serializable
-
-case class SearchRating() {
-    def getFilterRatingRDD(rdd: RDD[Rating]): RDD[Rating] = {
-        rdd.distinct()
-    }
-}

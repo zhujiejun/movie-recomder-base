@@ -12,9 +12,3 @@ import org.apache.spark.rdd.RDD
  */
 @SerialVersionUID(1003L)
 case class Tag(uid: Int, mid: Int, tag: String, timestamp: Int) extends Serializable
-
-case class SearchTag() {
-    def getFilterRatingRDD(rdd: RDD[Tag]): RDD[Tag] = {
-        rdd.distinct()
-    }
-}
