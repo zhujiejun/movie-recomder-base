@@ -52,7 +52,6 @@ subprojects {
         implementation "com.google.guava:guava:${guavaVersion}"
         compileOnly "org.projectlombok:lombok:${lombokVersion}"
         annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-        implementation "org.scala-lang:scala-library:${scalaVersion}"
 
         // implementation "log4j:log4j:${log4j.version}"
         // implementation "org.slf4j:jcl-over-slf4j:${slf4j.version}"

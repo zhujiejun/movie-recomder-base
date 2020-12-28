@@ -5,6 +5,7 @@ import com.zhujiejun.recomder.data.{Movie, Rating, Tag}
 import com.zhujiejun.recomder.util.HBaseUtil
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
+import scala.collection.JavaConverters._
 
 object App000 {
     def storeDataInHabse(rowKey: String, columnFamily: String, column: String, value: String): Unit = {
@@ -20,23 +21,23 @@ object App000 {
             .set("spark.driver.cores", "6")
             .set("spark.driver.memory", "512m")
             .set("spark.executor.cores", "6")
-            .set("spark.executor.memory", "512m") //>=450m
+            .set("spark.executor.memory", "512m")
             .set("spark.submit.deployMode", "cluster")
         val spark = SparkSession.builder().config(sparkConf).getOrCreate()
 
         import spark.implicits._
         val movieRDD = spark.sparkContext.textFile(MOVIE_DATA_PATH)
-        val movieDF = movieRDD.map(item => {
+        val movieDS = movieRDD.map(item => {
             val attr = item.split("\\^")
             Movie(attr(0).toInt, attr(1).trim, attr(2).trim, attr(3).trim, attr(4).trim, attr(5).trim, attr(6).trim, attr(7).trim, attr(8).trim, attr(9).trim)
-        }).toDF()
-        movieDF.foreach(row => {
+        }).toDS()
+        movieDS.foreach(movie => {
             //val rowKey = RandomStringUtils.randomAlphanumeric(18)
-            for (i <- 0 to 9) {
+            /*for (i <- 0 to 9) {
+                println(s"----------column: ${MOVIE_fIELD_MAP(i)}, value: ${movie.get(i).toString}----------")
                 //storeDataInHabse(rowKey, HBASE_MOVIE_COLUMN_FAMILY, MOVIE_fIELD_MAP(i), row.get(i).toString)
-                println(s"----------column: ${MOVIE_fIELD_MAP(i)}, value: ${row.get(i).toString}----------")
-            }
-            println()
+            }*/
+            println(s"----------the movie is ${movie.toString}----------")
         })
 
         val ratingRDD = spark.sparkContext.textFile(RATING_DATA_PATH)

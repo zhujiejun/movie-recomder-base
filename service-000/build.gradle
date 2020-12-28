@@ -1,5 +1,6 @@
 project(':service-000') {
     dependencies {
+        implementation 'org.scala-lang:scala-library'
         implementation 'org.apache.hbase:hbase-server'
         implementation 'org.apache.hbase:hbase-client'
         implementation 'org.apache.spark:spark-core_2.12'
