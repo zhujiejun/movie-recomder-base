@@ -3,6 +3,7 @@ package com.zhujiejun.recomder
 import com.zhujiejun.recomder.cons.Const._
 import com.zhujiejun.recomder.data.{Movie, MovieSearch, RatingSearch, TagSearch}
 import com.zhujiejun.recomder.util.HBaseUtil
+import org.apache.commons.lang3.RandomStringUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 
@@ -46,12 +47,23 @@ object App000 {
                 attr(5).trim, attr(6).trim, attr(7).trim, attr(8).trim, attr(9).trim)
         })
         movieSearch.getFilterMovieRDD(movieRDD).foreach(movie => {
-            /*val rowKey = RandomStringUtils.randomAlphanumeric(18)
-              for (i <- 0 to 9) {
-                //println(s"----------column: ${MOVIE_fIELD_MAP(i)}, value: ${movie.get(i).toString}----------")
-                //storeDataInHabse(rowKey, HBASE_MOVIE_COLUMN_FAMILY, MOVIE_fIELD_MAP(i), row.get(i).toString)
-            }*/
             println(s"--------------------the movie is ${movie.toString}--------------------")
+            val rowKey = RandomStringUtils.randomAlphanumeric(18)
+            MOVIE_fIELD_NAMES.foreach { k =>
+                val v = k match {
+                    case "mid" => movie.mid
+                    case "name" => movie.name
+                    case "descri" => movie.descri
+                    case "timelong" => movie.timelong
+                    case "issue" => movie.issue
+                    case "shoot" => movie.shoot
+                    case "language" => movie.language
+                    case "genres" => movie.genres
+                    case "actors" => movie.actors
+                    case "directors" => movie.directors
+                }
+                storeDataInHabse(rowKey, HBASE_MOVIE_COLUMN_FAMILY, k, v.toString)
+            }
         })
 
         /*val ratingRDD = spark.sparkContext.textFile(RATING_DATA_PATH)

@@ -27,16 +27,6 @@ object Const {
         "spark.cores" -> "spark://node101:7077"
     )
 
-    val MOVIE_fIELD_MAP = Map(
-        0 -> "mid",
-        1 -> "name",
-        2 -> "descri",
-        3 -> "timelong",
-        4 -> "issue",
-        5 -> "shoot",
-        6 -> "language",
-        7 -> "genres",
-        8 -> "actors",
-        9 -> "directors"
-    )
+    val MOVIE_fIELD_NAMES = List("mid", "name", "descri", "timelong",
+        "issue", "shoot", "language", "genres", "actors", "directors")
 }
