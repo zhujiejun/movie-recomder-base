@@ -1,6 +1,5 @@
 package com.zhujiejun.recomder.util
 
-import com.google.common.collect.Lists
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.util.Bytes
@@ -8,19 +7,22 @@ import org.apache.hadoop.hbase.{Cell, CellUtil, HBaseConfiguration, TableName}
 import org.slf4j.{Logger, LoggerFactory}
 
 import java.util
+import scala.collection.JavaConversions._
 
 @SuppressWarnings(Array("unused"))
 object HBaseUtil {
+    //获取Admin对象
     private val CONFIG: Configuration = HBaseConfiguration.create()
+    CONFIG.set("hbase.zookeeper.quorum", "node101")
+    CONFIG.set("hbase.zookeeper.property.clientPort", "2181")
     private val CONNECTION: Connection = ConnectionFactory.createConnection(CONFIG)
     private val ADMIN: Admin = CONNECTION.getAdmin
     private val LOG: Logger = LoggerFactory.getLogger("HBaseUtil")
 
-    {
-        //获取Admin对象
+    /*{
         CONFIG.set("hbase.zookeeper.quorum", "node101")
         CONFIG.set("hbase.zookeeper.property.clientPort", "2181")
-    }
+    }*/
 
     //显示表
     private def show(cell: Cell): Unit = {
@@ -42,7 +44,7 @@ object HBaseUtil {
     def createTable(tableName: String, columnFamily: String*): Unit = {
         if (isTableExist(tableName)) LOG.info("----------table {} existed----------", tableName)
         else {
-            val columnFamilies: util.List[ColumnFamilyDescriptor] = Lists.newArrayList
+            val columnFamilies: List[ColumnFamilyDescriptor] = List()
             for (sf <- columnFamily) {
                 columnFamilies.add(ColumnFamilyDescriptorBuilder.of(sf))
             }
@@ -95,7 +97,6 @@ object HBaseUtil {
         val scan = new Scan
         val table = CONNECTION.getTable(TableName.valueOf(tableName))
         val resultScanner = table.getScanner(scan)
-        import scala.collection.JavaConversions._
         for (result <- resultScanner) {
             val cells = result.rawCells
             for (cell <- cells) {
