@@ -12,10 +12,10 @@ object Const {
     val HBASE_ZOOKEEPER_QUORUM = "node101"
     val hbase_zookeeper_property_clientport = "2181"
 
-    val HBASE_MOVIE_TABLE_NAME = "sfb_recomder"
-    val HBASE_MOVIE_COLUMN_FAMILY = "sfb_movie"
-    val HBASE_RATING_COLUMN_FAMILY = "sfb_rating"
-    val HBASE_TAG_COLUMN_FAMILY = "sfb_tag"
+    val HBASE_MOVIE_TABLE_NAME = "sfb_original"
+    val HBASE_MOVIE_COLUMN_FAMILY = "sfb_original_movie"
+    val HBASE_RATING_COLUMN_FAMILY = "sfb_original_rating"
+    val HBASE_TAG_COLUMN_FAMILY = "sfb_original_tag"
 
     val CONFIG = Map(
         "spark.cores" -> "local[*]"

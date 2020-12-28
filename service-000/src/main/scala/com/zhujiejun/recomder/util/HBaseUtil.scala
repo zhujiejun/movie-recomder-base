@@ -1,7 +1,7 @@
 package com.zhujiejun.recomder.util
 
 import com.google.common.collect.Lists
-import com.zhujiejun.recomder.cons.Const.HBASE_MOVIE_TABLE_NAME
+import com.zhujiejun.recomder.cons.Const._
 import com.zhujiejun.recomder.data.{Movie, Rating, Tag}
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.hbase.client._
@@ -136,12 +136,11 @@ object HBaseUtil {
         }
     }
 
-    def checkTableExistInHabse(columnFamily: String*): Unit = {
+    def checkTableExistInHabse(): Unit = {
         if (!HBaseUtil.isTableExist(HBASE_MOVIE_TABLE_NAME)) {
             println(s"----------the table $HBASE_MOVIE_TABLE_NAME  not existed, create the table----------")
-            for (CF <- columnFamily) {
-                HBaseUtil.createTable(HBASE_MOVIE_TABLE_NAME, CF)
-            }
+            HBaseUtil.createTable(HBASE_MOVIE_TABLE_NAME, HBASE_MOVIE_COLUMN_FAMILY,
+                HBASE_RATING_COLUMN_FAMILY, HBASE_TAG_COLUMN_FAMILY)
         }
     }
 
