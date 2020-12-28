@@ -29,7 +29,8 @@ object App000 {
         val movie = spark.sparkContext.textFile(MOVIE_DATA_PATH)
         val movieRDD = movie.map(item => {
             val attr = item.split("\\^")
-            Movie(attr(0).toInt, attr(1).trim, attr(2).trim, attr(3).trim, attr(4).trim, attr(5).trim, attr(6).trim, attr(7).trim, attr(8).trim, attr(9).trim)
+            Movie(attr(0).toInt, attr(1).trim, attr(2).trim, attr(3).trim, attr(4).trim,
+                attr(5).trim, attr(6).trim, attr(7).trim, attr(8).trim, attr(9).trim)
         })
         SearchMovie().getFilterMovieRDD(movieRDD).foreach(movie => {
             /*val rowKey = RandomStringUtils.randomAlphanumeric(18)
