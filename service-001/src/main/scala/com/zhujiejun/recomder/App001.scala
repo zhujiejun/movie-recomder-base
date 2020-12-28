@@ -117,7 +117,7 @@ object App001 {
             val rowKey = RandomStringUtils.randomAlphanumeric(18)
             GENRES_TOP_MOVIES_fIELD_NAMES.foreach { k =>
                 val v = k match {
-                    case "mid" => item.get(0).toString
+                    case "mid" => item.get(0).toString //todo
                     case "score" => item.get(1).toString
                     case _ => ""
                 }
