@@ -195,7 +195,8 @@ object HBaseUtil {
                 }
             }
             }
-            val rating = Rating(ratingMap("uid").toInt, ratingMap("mid").toInt, ratingMap("score").toDouble, ratingMap("timestamp").toInt)
+            val rating = Rating(ratingMap("uid").toDouble.toInt, ratingMap("mid").toDouble.toInt,
+                ratingMap("score").toDouble, ratingMap("timestamp").toInt)
             ratings.append(rating)
         }
         ratings.toList
@@ -237,8 +238,9 @@ object HBaseUtil {
 
     def main(args: Array[String]): Unit = {
         //System.out.println(HBaseUtil.isTableExist("sfb_base"))
-        HBaseUtil.getMoviesFromHbase(HBASE_MOVIE_TABLE_NAME, HBASE_MOVIE_COLUMN_FAMILY).foreach { movie =>
+        /*HBaseUtil.getRatingsFromHbase(HBASE_MOVIE_TABLE_NAME, HBASE_RATING_COLUMN_FAMILY).foreach { movie =>
             println(s"---------the current movie is ${movie.toString}---------")
-        }
+        }*/
+        println("665.0".toDouble.toInt)
     }
 }

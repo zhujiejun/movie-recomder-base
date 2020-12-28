@@ -38,7 +38,7 @@ object App001 {
 
         //不同的统计推荐结果
         //1.历史热门统计,历史评分数据最多,mid,count
-        val rateMoreMoviesRDD = spark.sql("select mid, count(mid) as count from ratings_tmp group by mid").rdd
+        val rateMoreMoviesRDD = spark.sql("select mid, count(mid) count from ratings_tmp group by mid").rdd
         //把结果写入对应的HBase表中
         rateMoreMoviesRDD.foreach { item =>
             val rowKey = RandomStringUtils.randomAlphanumeric(18)
@@ -51,7 +51,8 @@ object App001 {
                 HBaseUtil.addRowData(STATIC_MOVIE_TABLE_NAME, rowKey, RATE_MORE_MOVIES_COLUMN_FAMILY, k, v)
             }
         }
-
+        spark.close()
+        return
         //2.近期热门统计，按照"yyyyMM"格式选取最近的评分数据，统计评分个数
         //创建一个日期格式化工具
         val simpleDateFormat = new SimpleDateFormat("yyyyMM")

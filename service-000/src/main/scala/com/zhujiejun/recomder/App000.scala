@@ -11,9 +11,6 @@ import org.apache.spark.sql.SparkSession
 
 object App000 {
     def main(args: Array[String]): Unit = {
-        /*Array(classOf[MovieSearch], classOf[RatingSearch]) foreach println
-        return*/
-
         val sparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_000_NAME)
         sparkConf
             /*.set("spark.submit.deployMode", "cluster")
