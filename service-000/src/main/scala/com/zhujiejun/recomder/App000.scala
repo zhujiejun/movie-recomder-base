@@ -10,8 +10,6 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
 object App000 {
-
-
     def main(args: Array[String]): Unit = {
         /*Array(classOf[MovieSearch], classOf[RatingSearch]) foreach println
         return*/

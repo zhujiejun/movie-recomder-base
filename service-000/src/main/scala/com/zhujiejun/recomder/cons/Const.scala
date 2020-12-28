@@ -9,10 +9,6 @@ object Const {
     val RATING_DATA_PATH = "/home/cat/Downloads/common/ratings.csv"
     val TAG_DATA_PATH = "/home/cat/Downloads/common/tags.csv"
 
-    /*val MOVIE_DATA_PATH = "/home/cat/movies.csv"
-    val RATING_DATA_PATH = "/home/cat/ratings.csv"
-    val TAG_DATA_PATH = "/home/cat/tags.csv"*/
-
     val HBASE_ZOOKEEPER_QUORUM = "node101"
     val hbase_zookeeper_property_clientport = "2181"
 
@@ -23,7 +19,6 @@ object Const {
 
     val CONFIG = Map(
         "spark.cores" -> "local[*]"
-        //"spark.cores" -> "spark://node101:7077"
     )
 
     val MOVIE_fIELD_NAMES = List("mid", "name", "descri", "timelong",
