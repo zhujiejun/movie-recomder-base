@@ -1,5 +1,7 @@
 package com.zhujiejun.recomder.data
 
+import org.apache.spark.rdd.RDD
+
 /**
  * Movie 数据集
  *
@@ -19,3 +21,9 @@ package com.zhujiejun.recomder.data
 case class Movie(mid: Int, name: String, descri: String, timelong: String,
                  issue: String, shoot: String, language: String,
                  genres: String, actors: String, directors: String) extends Serializable
+
+case class SearchMovie() {
+    def getFilterMovieRDD(rdd: RDD[Movie]): RDD[Movie] = {
+        rdd.distinct()
+    }
+}
