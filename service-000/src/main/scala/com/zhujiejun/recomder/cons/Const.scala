@@ -27,9 +27,7 @@ object Const {
 
     val MOVIE_fIELD_NAMES = List("mid", "name", "descri", "timelong",
         "issue", "shoot", "language", "genres", "actors", "directors")
-
     val RATING_fIELD_NAMES = List("uid", "mid", "score", "timestamp")
-
     val TAG_fIELD_NAMES = List("uid", "mid", "tag", "timestamp")
 
     //统计的表的名称
@@ -38,4 +36,9 @@ object Const {
     val RATE_MORE_RECENTLY_MOVIES = "rate-more-recently-movies"
     val AVERAGE_MOVIES = "average-movies"
     val GENRES_TOP_MOVIES = "genres-top-movies"
+
+    val RATE_MORE_MOVIES_fIELD_NAMES = List("mid", "count")
+    val RATE_MORE_RECENTLY_MOVIES_fIELD_NAMES = List("mid", "count", "yearmonth")
+    val AVERAGE_MOVIES_fIELD_NAMES = List("mid", "avg")
+    val GENRES_TOP_MOVIES_fIELD_NAMES = List("mid", "score") //todo
 }

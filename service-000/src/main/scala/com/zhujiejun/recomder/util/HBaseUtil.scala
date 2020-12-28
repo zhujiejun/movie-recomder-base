@@ -124,39 +124,6 @@ object HBaseUtil {
         }
     }
 
-    //获取指定"列族:列"的数据
-    def getRowQualifier(tableName: String, family: String, qualifier: String): List[Movie] = {
-        val movies: List[Movie] = List()
-        val table = CONNECTION.getTable(TableName.valueOf(tableName))
-        val resultScanner = table.getScanner(Bytes.toBytes(family), Bytes.toBytes(qualifier))
-        resultScanner.foreach { result =>
-            val cells = result.rawCells()
-            cells.foreach { cell => {
-                val map: Map[String, String] = Map()
-                val column = Bytes.toString(CellUtil.cloneQualifier(cell))
-                val value = Bytes.toString(CellUtil.cloneValue(cell))
-                column match {
-                    case "mid" => map.put("mid", value)
-                    case "name" => map.put("name", value)
-                    case "descri" => map.put("descri", value)
-                    case "timelong" => map.put("timelong", value)
-                    case "issue" => map.put("issue", value)
-                    case "shoot" => map.put("shoot", value)
-                    case "language" => map.put("language", value)
-                    case "genres" => map.put("genres", value)
-                    case "actors" => map.put("actors", value)
-                    case "directors" => map.put("directors", value)
-                    case _ => println
-                }
-                val movie = Movie(map("mid").toInt, map("name"), map("descri"), map("timelong"), map("issue"),
-                    map("shoot"), map("language"), map("genres"), map("actors"), map("directors"))
-                movies.+:(movie)
-            }
-            }
-        }
-        movies
-    }
-
     //获取某一行指定"列族:列"的数据
     @throws[Throwable]
     def getRowQualifier(tableName: String, rowKey: String, family: String, qualifier: String): Unit = {
@@ -167,6 +134,68 @@ object HBaseUtil {
         for (cell <- result.rawCells) {
             show(cell)
         }
+    }
+
+    //获取指定"列族:列"的数据Movie
+    @throws[Throwable]
+    def getMoviesFromHbase(tableName: String, family: String): List[Movie] = {
+        val movies: List[Movie] = List()
+        val table = CONNECTION.getTable(TableName.valueOf(tableName))
+        val resultScanner = table.getScanner(Bytes.toBytes(family))
+        resultScanner.foreach { result =>
+            val cells = result.rawCells()
+            cells.foreach { cell => {
+                var movieMap: Map[String, String] = Map()
+                val column = Bytes.toString(CellUtil.cloneQualifier(cell))
+                val value = Bytes.toString(CellUtil.cloneValue(cell))
+                column match {
+                    case "mid" => movieMap += ("mid" -> value)
+                    case "name" => movieMap += ("name" -> value)
+                    case "descri" => movieMap += ("descri" -> value)
+                    case "timelong" => movieMap += ("timelong" -> value)
+                    case "issue" => movieMap += ("issue" -> value)
+                    case "shoot" => movieMap += ("shoot" -> value)
+                    case "language" => movieMap += ("language" -> value)
+                    case "genres" => movieMap += ("genres" -> value)
+                    case "actors" => movieMap += ("actors" -> value)
+                    case "directors" => movieMap += ("directors" -> value)
+                    case _ => println
+                }
+                val movie = Movie(movieMap("mid").toInt, movieMap("name"), movieMap("descri"),
+                    movieMap("timelong"), movieMap("issue"), movieMap("shoot"), movieMap("language"),
+                    movieMap("genres"), movieMap("actors"), movieMap("directors"))
+                movies.+:(movie)
+            }
+            }
+        }
+        movies
+    }
+
+    //获取指定"列族:列"的数据Rating
+    @throws[Throwable]
+    def getRatingsFromHbase(tableName: String, family: String): List[Rating] = {
+        val ratings: List[Rating] = List()
+        val table = CONNECTION.getTable(TableName.valueOf(tableName))
+        val resultScanner = table.getScanner(Bytes.toBytes(family))
+        resultScanner.foreach { result =>
+            val cells = result.rawCells()
+            cells.foreach { cell => {
+                var ratingMap: Map[String, String] = Map()
+                val column = Bytes.toString(CellUtil.cloneQualifier(cell))
+                val value = Bytes.toString(CellUtil.cloneValue(cell))
+                column match {
+                    case "uid" => ratingMap += ("uid" -> value)
+                    case "mid" => ratingMap += ("mid" -> value)
+                    case "score" => ratingMap += ("score" -> value)
+                    case "timestamp" => ratingMap += ("timestamp" -> value)
+                    case _ => println
+                }
+                val rating = Rating(ratingMap("uid").toInt, ratingMap("mid").toInt, ratingMap("score").toDouble, ratingMap("timestamp").toInt)
+                ratings.+:(rating)
+            }
+            }
+        }
+        ratings
     }
 
     def checkTableExistInHabse(): Unit = {
@@ -193,6 +222,9 @@ object HBaseUtil {
     }
 
     def main(args: Array[String]): Unit = {
-        System.out.println(HBaseUtil.isTableExist("sfb_base"))
+        //System.out.println(HBaseUtil.isTableExist("sfb_base"))
+        HBaseUtil.getMoviesFromHbase("sfb_original", "sfb_original_movie").foreach { movie =>
+            println(s"---------the current movie is ${movie.toString}---------")
+        }
     }
 }
