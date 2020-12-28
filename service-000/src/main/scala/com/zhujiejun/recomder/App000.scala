@@ -1,7 +1,7 @@
 package com.zhujiejun.recomder
 
 import com.zhujiejun.recomder.cons.Const._
-import com.zhujiejun.recomder.data.{Movie, MovieSearch}
+import com.zhujiejun.recomder.data.{Movie, MovieSearch, RatingSearch, TagSearch}
 import com.zhujiejun.recomder.util.HBaseUtil
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
@@ -15,15 +15,27 @@ object App000 {
     }
 
     def main(args: Array[String]): Unit = {
+        /*Array(classOf[MovieSearch], classOf[RatingSearch]) foreach println
+        return*/
+
         val sparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_001_NAME)
         sparkConf.set("spark.submit.deployMode", "cluster")
+            .set("spark.jars", DRIVER_PATH)
             .set("spark.driver.cores", "6")
             .set("spark.driver.memory", "512m")
             .set("spark.executor.cores", "6")
             .set("spark.executor.memory", "512m")
             .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
-            .registerKryoClasses(Array(classOf[MovieSearch]))
+            .registerKryoClasses(Array(classOf[MovieSearch], classOf[RatingSearch], classOf[TagSearch]))
         val spark = SparkSession.builder().config(sparkConf).getOrCreate()
+
+        /*var classNames: String = ""
+        sparkConf.get("spark.kryo.classesToRegister").foreach { char =>
+            classNames = classNames + char
+        }
+        println(s"----------the class names is: $classNames----------")
+        spark.close()
+        return*/
 
         //import spark.implicits._
         val movieSearch = new MovieSearch()
@@ -39,7 +51,7 @@ object App000 {
                 //println(s"----------column: ${MOVIE_fIELD_MAP(i)}, value: ${movie.get(i).toString}----------")
                 //storeDataInHabse(rowKey, HBASE_MOVIE_COLUMN_FAMILY, MOVIE_fIELD_MAP(i), row.get(i).toString)
             }*/
-            println(s"----------the movie is ${movie.toString}----------")
+            println(s"--------------------the movie is ${movie.toString}--------------------")
         })
 
         /*val ratingRDD = spark.sparkContext.textFile(RATING_DATA_PATH)

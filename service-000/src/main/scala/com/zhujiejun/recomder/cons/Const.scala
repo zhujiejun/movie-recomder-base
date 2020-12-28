@@ -12,6 +12,8 @@ object Const {
     val RATING_DATA_PATH = "/home/cat/ratings.csv"
     val TAG_DATA_PATH = "/home/cat/tags.csv"
 
+    val DRIVER_PATH = "/home/cat/service-000/lib/service-000.jar"
+
     val HBASE_ZOOKEEPER_QUORUM = "node101"
     val hbase_zookeeper_property_clientport = "2181"
 
