@@ -11,29 +11,26 @@ import java.util
 
 @SuppressWarnings(Array("unused"))
 object HBaseUtil {
-    private var ADMIN: Admin = null
-    private var CONNECTION: Connection = null
-    private var CONFIG: Configuration = null
-    private val log: Logger = LoggerFactory.getLogger("HBaseUtil")
+    private val CONFIG: Configuration = HBaseConfiguration.create()
+    private val CONNECTION: Connection = ConnectionFactory.createConnection(CONFIG)
+    private val ADMIN: Admin = CONNECTION.getAdmin
+    private val LOG: Logger = LoggerFactory.getLogger("HBaseUtil")
 
     {
         //获取Admin对象
-        CONFIG = HBaseConfiguration.create()
         CONFIG.set("hbase.zookeeper.quorum", "node101")
         CONFIG.set("hbase.zookeeper.property.clientPort", "2181")
-        CONNECTION = ConnectionFactory.createConnection(CONFIG)
-        ADMIN = CONNECTION.getAdmin
     }
 
     //显示表
     private def show(cell: Cell): Unit = {
-        log.info("-----------------------------------------------------------------------")
-        log.info("----------columnFamily: {}----------", Bytes.toString(CellUtil.cloneFamily(cell)))
-        log.info("----------rowKey: {}----------", Bytes.toString(CellUtil.cloneRow(cell)))
-        log.info("----------column: {}----------", Bytes.toString(CellUtil.cloneQualifier(cell)))
-        log.info("----------value: {}----------", Bytes.toString(CellUtil.cloneValue(cell)))
-        log.info("----------timestamp: {}----------", cell.getTimestamp)
-        log.info("-----------------------------------------------------------------------")
+        LOG.info("-----------------------------------------------------------------------")
+        LOG.info("----------columnFamily: {}----------", Bytes.toString(CellUtil.cloneFamily(cell)))
+        LOG.info("----------rowKey: {}----------", Bytes.toString(CellUtil.cloneRow(cell)))
+        LOG.info("----------column: {}----------", Bytes.toString(CellUtil.cloneQualifier(cell)))
+        LOG.info("----------value: {}----------", Bytes.toString(CellUtil.cloneValue(cell)))
+        LOG.info("----------timestamp: {}----------", cell.getTimestamp)
+        LOG.info("-----------------------------------------------------------------------")
     }
 
     //是否存在
@@ -43,7 +40,7 @@ object HBaseUtil {
     //创建表
     @throws[Throwable]
     def createTable(tableName: String, columnFamily: String*): Unit = {
-        if (isTableExist(tableName)) log.info("----------table {} existed----------", tableName)
+        if (isTableExist(tableName)) LOG.info("----------table {} existed----------", tableName)
         else {
             val columnFamilies: util.List[ColumnFamilyDescriptor] = Lists.newArrayList
             for (sf <- columnFamily) {
@@ -52,7 +49,7 @@ object HBaseUtil {
             val descriptor: TableDescriptor = TableDescriptorBuilder.newBuilder(TableName.valueOf(tableName))
                 .setColumnFamilies(columnFamilies).build
             ADMIN.createTable(descriptor)
-            log.info("----------table {} create success!----------", tableName)
+            LOG.info("----------table {} create success!----------", tableName)
         }
     }
 
@@ -62,9 +59,9 @@ object HBaseUtil {
         if (isTableExist(tableName)) {
             ADMIN.disableTable(TableName.valueOf(tableName))
             ADMIN.deleteTable(TableName.valueOf(tableName))
-            log.info("----------table {} delete success!----------", tableName)
+            LOG.info("----------table {} delete success!----------", tableName)
         }
-        else log.info("----------table {} not exist!----------", tableName)
+        else LOG.info("----------table {} not exist!----------", tableName)
     }
 
     //向表中插入数据
@@ -75,7 +72,7 @@ object HBaseUtil {
         data.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes(column), Bytes.toBytes(value))
         table.put(data)
         table.close()
-        log.info("----------add data success!----------")
+        LOG.info("----------add data success!----------")
     }
 
     //删除多行数据
@@ -89,7 +86,7 @@ object HBaseUtil {
         }
         table.delete(deleteList)
         table.close()
-        log.info("----------delete data success!----------")
+        LOG.info("----------delete data success!----------")
     }
 
     //获取所有数据
