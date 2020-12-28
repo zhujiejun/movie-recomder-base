@@ -33,7 +33,7 @@ object Const {
     val RATE_MORE_MOVIES_fIELD_NAMES = List("mid", "count")
     val RATE_MORE_RECENTLY_MOVIES_fIELD_NAMES = List("mid", "count", "yearmonth")
     val AVERAGE_MOVIES_fIELD_NAMES = List("mid", "avg")
-    val GENRES_TOP_MOVIES_fIELD_NAMES = List("mid", "score") //todo
+    val GENRES_TOP_MOVIES_fIELD_NAMES = List("genres", "recs")
 
     val STATIC_MOVIE_TABLE_NAME = "sfb_static"
     val RATE_MORE_MOVIES_COLUMN_FAMILY = "rate-more-movies"
