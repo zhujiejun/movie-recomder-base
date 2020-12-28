@@ -26,13 +26,14 @@ object App000 {
         val spark = SparkSession.builder().config(sparkConf).getOrCreate()
 
         //import spark.implicits._
+        val movieSearch = new MovieSearch()
         val movie = spark.sparkContext.textFile(MOVIE_DATA_PATH)
         val movieRDD = movie.map(item => {
             val attr = item.split("\\^")
             Movie(attr(0).toInt, attr(1).trim, attr(2).trim, attr(3).trim, attr(4).trim,
                 attr(5).trim, attr(6).trim, attr(7).trim, attr(8).trim, attr(9).trim)
         })
-        MovieSearch().getFilterMovieRDD(movieRDD).foreach(movie => {
+        movieSearch.getFilterMovieRDD(movieRDD).foreach(movie => {
             /*val rowKey = RandomStringUtils.randomAlphanumeric(18)
               for (i <- 0 to 9) {
                 //println(s"----------column: ${MOVIE_fIELD_MAP(i)}, value: ${movie.get(i).toString}----------")
