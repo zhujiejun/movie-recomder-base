@@ -28,4 +28,8 @@ object Const {
 
     val MOVIE_fIELD_NAMES = List("mid", "name", "descri", "timelong",
         "issue", "shoot", "language", "genres", "actors", "directors")
+
+    val RATING_fIELD_NAMES = List("uid", "mid", "score", "timestamp")
+
+    val TAG_fIELD_NAMES = List("uid", "mid", "tag", "timestamp")
 }
