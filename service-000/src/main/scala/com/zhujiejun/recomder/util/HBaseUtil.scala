@@ -159,7 +159,7 @@ object HBaseUtil {
                     case "genres" => movieMap += ("genres" -> value)
                     case "actors" => movieMap += ("actors" -> value)
                     case "directors" => movieMap += ("directors" -> value)
-                    case _ => println
+                    case _ => ""
                 }
                 val movie = Movie(movieMap("mid").toInt, movieMap("name"), movieMap("descri"),
                     movieMap("timelong"), movieMap("issue"), movieMap("shoot"), movieMap("language"),
