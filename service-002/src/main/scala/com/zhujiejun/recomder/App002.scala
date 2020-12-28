@@ -24,7 +24,7 @@ object App002 {
             .set("spark.driver.cores", "6")
             .set("spark.driver.memory", "512m")
             .set("spark.executor.cores", "6")
-            .set("spark.executor.memory", "512m")
+            .set("spark.executor.memory", "1g")
             .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
             .registerKryoClasses(Array(classOf[MovieSearch], classOf[RatingSearch], classOf[TagSearch]))
         val spark = SparkSession.builder().config(sparkConf).getOrCreate()
