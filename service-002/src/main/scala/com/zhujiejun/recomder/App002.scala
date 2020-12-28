@@ -80,7 +80,7 @@ object App002 {
                 case (a, b) => a._1 != b._1 //把自己跟自己的配对过滤掉
             }
             .map {
-                case (a, b) => val simScore = this.consinSim(a._2, b._2)
+                case (a, b) => val simScore = consinSim(a._2, b._2)
                     (a._1, (b._1, simScore))
             }
             .filter {
