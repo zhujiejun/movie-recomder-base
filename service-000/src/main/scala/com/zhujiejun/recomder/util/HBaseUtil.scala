@@ -128,4 +128,8 @@ object HBaseUtil {
             show(cell)
         }
     }
+
+    def main(args: Array[String]): Unit = {
+        System.out.println(HBaseUtil.isTableExist("sfb_base"))
+    }
 }
