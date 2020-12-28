@@ -1,10 +1,13 @@
 package com.zhujiejun.recomder.util
 
 import com.google.common.collect.Lists
+import com.zhujiejun.recomder.cons.Const.HBASE_MOVIE_TABLE_NAME
+import com.zhujiejun.recomder.data.{Movie, Rating, Tag}
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.util.Bytes
 import org.apache.hadoop.hbase.{Cell, CellUtil, HBaseConfiguration, TableName}
+import org.apache.spark.rdd.RDD
 import org.slf4j.{Logger, LoggerFactory}
 
 import java.util
@@ -131,6 +134,31 @@ object HBaseUtil {
         for (cell <- result.rawCells) {
             show(cell)
         }
+    }
+
+    def checkTableExistInHabse(columnFamily: String): Unit = {
+        if (!HBaseUtil.isTableExist(HBASE_MOVIE_TABLE_NAME)) {
+            println(s"----------the table $HBASE_MOVIE_TABLE_NAME  not existed, create the table----------")
+            HBaseUtil.createTable(HBASE_MOVIE_TABLE_NAME, columnFamily)
+        }
+    }
+
+    //Movie
+    def storeMovieDataInHabse(columnFamily: String)(implicit data: RDD[Movie], save: RDD[Movie] => Unit): Unit = {
+        checkTableExistInHabse(columnFamily)
+        save(data)
+    }
+
+    //Rating
+    def storeRatingDataInHabse(columnFamily: String)(implicit data: RDD[Rating], save: RDD[Rating] => Unit): Unit = {
+        checkTableExistInHabse(columnFamily)
+        save(data)
+    }
+
+    //Tag
+    def storeTagDataInHabse(columnFamily: String)(implicit data: RDD[Tag], save: RDD[Tag] => Unit): Unit = {
+        checkTableExistInHabse(columnFamily)
+        save(data)
     }
 
     def main(args: Array[String]): Unit = {

@@ -3,33 +3,14 @@ package com.zhujiejun.recomder
 import com.zhujiejun.recomder.cons.Const._
 import com.zhujiejun.recomder.data._
 import com.zhujiejun.recomder.util.HBaseUtil
+import com.zhujiejun.recomder.util.HBaseUtil._
 import org.apache.commons.lang3.RandomStringUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
 object App000 {
-    private def checkTableExistInHabse(columnFamily: String): Unit = {
-        if (!HBaseUtil.isTableExist(HBASE_MOVIE_TABLE_NAME)) {
-            println(s"----------the table $HBASE_MOVIE_TABLE_NAME  not existed, create the table----------")
-            HBaseUtil.createTable(HBASE_MOVIE_TABLE_NAME, columnFamily)
-        }
-    }
 
-    private def storeMovieDataInHabse(columnFamily: String)(implicit data: RDD[Movie], save: RDD[Movie] => Unit): Unit = {
-        checkTableExistInHabse(columnFamily)
-        save(data)
-    }
-
-    private def storeRatingDataInHabse(columnFamily: String)(implicit data: RDD[Rating], save: RDD[Rating] => Unit): Unit = {
-        checkTableExistInHabse(columnFamily)
-        save(data)
-    }
-
-    private def storeTagDataInHabse(columnFamily: String)(implicit data: RDD[Tag], save: RDD[Tag] => Unit): Unit = {
-        checkTableExistInHabse(columnFamily)
-        save(data)
-    }
 
     def main(args: Array[String]): Unit = {
         /*Array(classOf[MovieSearch], classOf[RatingSearch]) foreach println
