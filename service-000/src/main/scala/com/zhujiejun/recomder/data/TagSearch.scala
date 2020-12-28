@@ -2,7 +2,7 @@ package com.zhujiejun.recomder.data
 
 import org.apache.spark.rdd.RDD
 
-case class SearchTag() {
+case class TagSearch() {
     def getFilterRatingRDD(rdd: RDD[Tag]): RDD[Tag] = {
         rdd.distinct()
     }

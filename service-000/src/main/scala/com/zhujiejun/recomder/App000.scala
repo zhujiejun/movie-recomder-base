@@ -1,7 +1,7 @@
 package com.zhujiejun.recomder
 
 import com.zhujiejun.recomder.cons.Const._
-import com.zhujiejun.recomder.data.{Movie, SearchMovie}
+import com.zhujiejun.recomder.data.{Movie, MovieSearch}
 import com.zhujiejun.recomder.util.HBaseUtil
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
@@ -22,7 +22,7 @@ object App000 {
             .set("spark.executor.cores", "6")
             .set("spark.executor.memory", "512m")
             .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
-            .registerKryoClasses(Array(classOf[SearchMovie]))
+            .registerKryoClasses(Array(classOf[MovieSearch]))
         val spark = SparkSession.builder().config(sparkConf).getOrCreate()
 
         //import spark.implicits._
@@ -32,7 +32,7 @@ object App000 {
             Movie(attr(0).toInt, attr(1).trim, attr(2).trim, attr(3).trim, attr(4).trim,
                 attr(5).trim, attr(6).trim, attr(7).trim, attr(8).trim, attr(9).trim)
         })
-        SearchMovie().getFilterMovieRDD(movieRDD).foreach(movie => {
+        MovieSearch().getFilterMovieRDD(movieRDD).foreach(movie => {
             /*val rowKey = RandomStringUtils.randomAlphanumeric(18)
               for (i <- 0 to 9) {
                 //println(s"----------column: ${MOVIE_fIELD_MAP(i)}, value: ${movie.get(i).toString}----------")
