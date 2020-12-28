@@ -21,7 +21,7 @@ object App000 {
             .set("spark.driver.memory", "512m")
             .set("spark.executor.cores", "6")
             .set("spark.executor.memory", "512m")
-            //.set("spark.submit.deployMode", "cluster")
+            .set("spark.submit.deployMode", "cluster")
             .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
             .registerKryoClasses(Array(classOf[SearchMovie]))
         val spark = SparkSession.builder().config(sparkConf).getOrCreate()
