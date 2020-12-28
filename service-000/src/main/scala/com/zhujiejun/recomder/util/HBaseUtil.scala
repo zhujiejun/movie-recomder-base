@@ -217,6 +217,11 @@ object HBaseUtil {
                         RATE_MORE_RECENTLY_MOVIES_COLUMN_FAMILY, AVERAGE_MOVIES_COLUMN_FAMILY,
                         GENRES_TOP_MOVIES_COLUMN_FAMILY)
                 }
+            case OFFLINE_MOVIE_TABLE_NAME =>
+                if (!HBaseUtil.isTableExist(OFFLINE_MOVIE_TABLE_NAME)) {
+                    println(s"----------the table $OFFLINE_MOVIE_TABLE_NAME  not existed, create the table----------")
+                    HBaseUtil.createTable(OFFLINE_MOVIE_TABLE_NAME, USER_RECS_COLUMN_FAMILY, MOVIE_RECS_COLUMN_FAMILY)
+                }
             case _ => println
         }
     }

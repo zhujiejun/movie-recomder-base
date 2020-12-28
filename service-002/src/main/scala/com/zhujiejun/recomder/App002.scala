@@ -3,6 +3,7 @@ package com.zhujiejun.recomder
 import com.zhujiejun.recomder.cons.Const._
 import com.zhujiejun.recomder.data._
 import com.zhujiejun.recomder.util.HBaseUtil
+import com.zhujiejun.recomder.util.HBaseUtil.checkTableExistInHabse
 import org.apache.commons.lang3.RandomStringUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.mllib.recommendation.{ALS, Rating => MLRating}
@@ -29,6 +30,7 @@ object App002 {
         val spark = SparkSession.builder().config(sparkConf).getOrCreate()
 
         import spark.implicits._
+        checkTableExistInHabse(OFFLINE_MOVIE_TABLE_NAME)
         val ratings: List[Rating] = HBaseUtil.getRatingsFromHbase(HBASE_MOVIE_TABLE_NAME, HBASE_RATING_COLUMN_FAMILY)
         val ratingRDD = spark.sparkContext.parallelize(ratings).map { rating =>
             (rating.uid, rating.mid, rating.score) //转化成rdd,并且去掉时间戳
