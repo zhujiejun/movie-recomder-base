@@ -14,7 +14,7 @@ object App000 {
         /*Array(classOf[MovieSearch], classOf[RatingSearch]) foreach println
         return*/
 
-        val sparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_001_NAME)
+        val sparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_000_NAME)
         sparkConf
             /*.set("spark.submit.deployMode", "cluster")
             .set("spark.jars", DRIVER_PATH)*/
