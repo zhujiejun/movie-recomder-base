@@ -57,10 +57,10 @@ object ALSTrainer {
         }.cache()
         //随机切分数据集，生成训练集和测试集
         val splits = ratingRDD.randomSplit(Array(0.8, 0.2))
-        val trainingRDD = splits(0)
+        val trainRDD = splits(0)
         val testRDD = splits(1)
         //模型参数选择，输出最优参数
-        adjustALSParam(trainingRDD, testRDD)
+        adjustALSParam(trainRDD, testRDD)
 
         spark.close()
     }
