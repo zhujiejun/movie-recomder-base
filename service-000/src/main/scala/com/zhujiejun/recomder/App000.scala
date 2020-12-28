@@ -49,7 +49,7 @@ object App000 {
                 attr(5).trim, attr(6).trim, attr(7).trim, attr(8).trim, attr(9).trim)
         })
         movieSearch.getFilterMovieRDD(movieRDD).foreach(movie => {
-            println(s"--------------------the movie is ${movie.toString}--------------------")
+            //println(s"--------------------the movie is ${movie.toString}--------------------")
             val rowKey = RandomStringUtils.randomAlphanumeric(18)
             MOVIE_fIELD_NAMES.foreach { k =>
                 val v = k match {
