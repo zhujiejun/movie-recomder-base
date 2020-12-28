@@ -18,7 +18,7 @@ object ALSTrainer {
                 (rank, lambda, rmse)
             }
         //控制台打印输出最优参数
-        println(result.minBy(_._3))
+        println(s"----------the result is ${result.minBy(_._3)}----------")
     }
 
     def getRMSE(model: MatrixFactorizationModel, data: RDD[MLRating]): Double = {
