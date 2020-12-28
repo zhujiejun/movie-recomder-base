@@ -43,7 +43,10 @@ object Const {
     val AVERAGE_MOVIES_COLUMN_FAMILY = "average-movies"
     val GENRES_TOP_MOVIES_COLUMN_FAMILY = "genres-top-movies"
 
-    //的表的名称
+    //离线的表的名称
+    val USER_RECS_fIELD_NAMES = List("uid", "recs")
+    val MOVIE_RECS_fIELD_NAMES = List("mid", "recs")
+
     val OFFLINE_MOVIE_TABLE_NAME = "sfb_offline"
     val USER_RECS_COLUMN_FAMILY = "user-recs"
     val MOVIE_RECS_COLUMN_FAMILY = "movie-recs"
