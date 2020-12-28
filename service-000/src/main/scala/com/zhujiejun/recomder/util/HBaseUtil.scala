@@ -124,6 +124,39 @@ object HBaseUtil {
         }
     }
 
+    //获取指定"列族:列"的数据
+    def getRowQualifier(tableName: String, family: String, qualifier: String): List[Movie] = {
+        val movies: List[Movie] = List()
+        val table = CONNECTION.getTable(TableName.valueOf(tableName))
+        val resultScanner = table.getScanner(Bytes.toBytes(family), Bytes.toBytes(qualifier))
+        resultScanner.foreach { result =>
+            val cells = result.rawCells()
+            cells.foreach { cell => {
+                val map: Map[String, String] = Map()
+                val column = Bytes.toString(CellUtil.cloneQualifier(cell))
+                val value = Bytes.toString(CellUtil.cloneValue(cell))
+                column match {
+                    case "mid" => map.put("mid", value)
+                    case "name" => map.put("name", value)
+                    case "descri" => map.put("descri", value)
+                    case "timelong" => map.put("timelong", value)
+                    case "issue" => map.put("issue", value)
+                    case "shoot" => map.put("shoot", value)
+                    case "language" => map.put("language", value)
+                    case "genres" => map.put("genres", value)
+                    case "actors" => map.put("actors", value)
+                    case "directors" => map.put("directors", value)
+                    case _ => println
+                }
+                val movie = Movie(map("mid").toInt, map("name"), map("descri"), map("timelong"), map("issue"),
+                    map("shoot"), map("language"), map("genres"), map("actors"), map("directors"))
+                movies.+:(movie)
+            }
+            }
+        }
+        movies
+    }
+
     //获取某一行指定"列族:列"的数据
     @throws[Throwable]
     def getRowQualifier(tableName: String, rowKey: String, family: String, qualifier: String): Unit = {

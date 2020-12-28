@@ -1,8 +1,12 @@
 package com.zhujiejun.recomder.cons
 
 object Const {
-    val SERVICE_001_NAME = "DataLoader"
-    val SERVICE_002_NAME = "xxxx"
+    val SERVICE_000_NAME = "data-loader"
+    val SERVICE_001_NAME = "statistics-recommender"
+    val SERVICE_002_NAME = "offline-recommender"
+    val SERVICE_003_NAME = "kafka-process-stream"
+    val SERVICE_004_NAME = "streaming-recommender"
+    val SERVICE_005_NAME = "content-recommender"
 
     val DRIVER_PATH = "/home/cat/service-000/lib/service-000.jar"
     val MOVIE_DATA_PATH = "/home/cat/Downloads/common/movies.csv"
@@ -27,4 +31,11 @@ object Const {
     val RATING_fIELD_NAMES = List("uid", "mid", "score", "timestamp")
 
     val TAG_fIELD_NAMES = List("uid", "mid", "tag", "timestamp")
+
+    //统计的表的名称
+    val STATIC_MOVIE_TABLE_NAME = "sfb_static"
+    val RATE_MORE_MOVIES = "rate-more-movies"
+    val RATE_MORE_RECENTLY_MOVIES = "rate-more-recently-movies"
+    val AVERAGE_MOVIES = "average-movies"
+    val GENRES_TOP_MOVIES = "genres-top-movies"
 }
