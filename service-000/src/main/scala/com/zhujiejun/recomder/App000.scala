@@ -1,7 +1,7 @@
 package com.zhujiejun.recomder
 
 import com.zhujiejun.recomder.cons.Const._
-import com.zhujiejun.recomder.data.Movie
+import com.zhujiejun.recomder.data.{Movie, SearchMovie}
 import com.zhujiejun.recomder.util.HBaseUtil
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
