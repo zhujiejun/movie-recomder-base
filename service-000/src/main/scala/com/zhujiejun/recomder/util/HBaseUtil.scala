@@ -18,8 +18,8 @@ import scala.collection.mutable.ListBuffer
 object HBaseUtil {
     //获取Admin对象
     private val CONFIG: Configuration = HBaseConfiguration.create()
-    CONFIG.set("hbase.zookeeper.quorum", "node101")
-    CONFIG.set("hbase.zookeeper.property.clientPort", "2181")
+    CONFIG.set("hbase.zookeeper.quorum", HBASE_ZOOKEEPER_QUORUM)
+    CONFIG.set("hbase.zookeeper.property.clientPort", HBASE_ZOOKEEPER_PROPERTY_CLIENTPORT)
     private val CONNECTION: Connection = ConnectionFactory.createConnection(CONFIG)
     private val ADMIN: Admin = CONNECTION.getAdmin
     private val log: Logger = LoggerFactory.getLogger("HBaseUtil")

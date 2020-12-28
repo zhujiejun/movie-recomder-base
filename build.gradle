@@ -69,6 +69,7 @@ subprojects {
             dependency "org.apache.spark:spark-streaming_2.12:${sparkVersion}"
             dependency "org.apache.spark:spark-mllib_2.12:${sparkVersion}"
             dependency "org.apache.spark:spark-graphx_2.12:${sparkVersion}"
+            dependency "org.jblas:jblas:${jblasVersion}"
         }
     }
 }
