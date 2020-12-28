@@ -35,9 +35,7 @@ object App000 {
         return*/
 
         //import spark.implicits._
-        checkTableExistInHabse()
-        //val movieSearch = new MovieSearch()
-
+        checkTableExistInHabse(HBASE_MOVIE_TABLE_NAME)
         val movie = spark.sparkContext.textFile(MOVIE_DATA_PATH)
         implicit val movieRDD: RDD[Movie] = movie.map(item => {
             val attr = item.split("\\^")

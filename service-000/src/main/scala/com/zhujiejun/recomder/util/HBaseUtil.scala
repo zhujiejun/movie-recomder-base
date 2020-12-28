@@ -201,11 +201,22 @@ object HBaseUtil {
         ratings.toList
     }
 
-    def checkTableExistInHabse(): Unit = {
-        if (!HBaseUtil.isTableExist(HBASE_MOVIE_TABLE_NAME)) {
-            println(s"----------the table $HBASE_MOVIE_TABLE_NAME  not existed, create the table----------")
-            HBaseUtil.createTable(HBASE_MOVIE_TABLE_NAME, HBASE_MOVIE_COLUMN_FAMILY,
-                HBASE_RATING_COLUMN_FAMILY, HBASE_TAG_COLUMN_FAMILY)
+    def checkTableExistInHabse(tableName: String): Unit = {
+        tableName match {
+            case HBASE_MOVIE_TABLE_NAME =>
+                if (!HBaseUtil.isTableExist(HBASE_MOVIE_TABLE_NAME)) {
+                    println(s"----------the table $HBASE_MOVIE_TABLE_NAME  not existed, create the table----------")
+                    HBaseUtil.createTable(HBASE_MOVIE_TABLE_NAME, HBASE_MOVIE_COLUMN_FAMILY,
+                        HBASE_RATING_COLUMN_FAMILY, HBASE_TAG_COLUMN_FAMILY)
+                }
+            case STATIC_MOVIE_TABLE_NAME =>
+                if (!HBaseUtil.isTableExist(STATIC_MOVIE_TABLE_NAME)) {
+                    println(s"----------the table $STATIC_MOVIE_TABLE_NAME  not existed, create the table----------")
+                    HBaseUtil.createTable(STATIC_MOVIE_TABLE_NAME, RATE_MORE_MOVIES_COLUMN_FAMILY,
+                        RATE_MORE_RECENTLY_MOVIES_COLUMN_FAMILY, AVERAGE_MOVIES_COLUMN_FAMILY,
+                        GENRES_TOP_MOVIES_COLUMN_FAMILY)
+                }
+            case _ => println
         }
     }
 

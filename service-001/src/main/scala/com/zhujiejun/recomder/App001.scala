@@ -3,6 +3,7 @@ package com.zhujiejun.recomder
 import com.zhujiejun.recomder.cons.Const._
 import com.zhujiejun.recomder.data._
 import com.zhujiejun.recomder.util.HBaseUtil
+import com.zhujiejun.recomder.util.HBaseUtil.checkTableExistInHabse
 import org.apache.commons.lang3.RandomStringUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
@@ -25,6 +26,7 @@ object App001 {
         val spark = SparkSession.builder().config(sparkConf).getOrCreate()
 
         import spark.implicits._
+        checkTableExistInHabse(STATIC_MOVIE_TABLE_NAME)
         val movies: List[Movie] = HBaseUtil.getMoviesFromHbase(HBASE_MOVIE_TABLE_NAME, HBASE_MOVIE_COLUMN_FAMILY)
         val movieDF = spark.sparkContext.parallelize(movies).toDF()
 
