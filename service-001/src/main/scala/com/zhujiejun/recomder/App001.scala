@@ -55,7 +55,7 @@ object App001 {
         //2.近期热门统计，按照"yyyyMM"格式选取最近的评分数据，统计评分个数
         //创建一个日期格式化工具
         val simpleDateFormat = new SimpleDateFormat("yyyyMM")
-        //注册udf，把时间戳转换成年月格式
+        //注册udf,把时间戳转换成年月格式
         spark.udf.register("changeDate", (x: Int) => simpleDateFormat.format(new Date(x * 1000L)).toInt)
         //对原始数据做预处理,去掉uid
         val ratingOfYearMonthDF = spark.sql("select mid, score, changeDate(timestamp) yearmonth from ratings_tmp")
@@ -70,7 +70,7 @@ object App001 {
                 val v = k match {
                     case "mid" => item.get(0).toString
                     case "count" => item.get(1).toString
-                    case "yearmonth" => item.get(3).toString
+                    case "yearmonth" => item.get(2).toString
                     case _ => ""
                 }
                 HBaseUtil.addRowData(STATIC_MOVIE_TABLE_NAME, rowKey, RATE_MORE_RECENTLY_MOVIES_COLUMN_FAMILY, k, v)
