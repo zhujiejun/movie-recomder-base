@@ -1,7 +1,7 @@
 package com.zhujiejun.recomder
 
 import com.zhujiejun.recomder.cons.Const._
-import com.zhujiejun.recomder.data._
+import com.zhujiejun.recomder.data.{Movie, SearchMovie}
 import com.zhujiejun.recomder.util.HBaseUtil
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
@@ -16,12 +16,11 @@ object App000 {
 
     def main(args: Array[String]): Unit = {
         val sparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_001_NAME)
-        sparkConf
+        sparkConf.set("spark.submit.deployMode", "cluster")
             .set("spark.driver.cores", "6")
             .set("spark.driver.memory", "512m")
             .set("spark.executor.cores", "6")
             .set("spark.executor.memory", "512m")
-            .set("spark.submit.deployMode", "cluster")
             .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
             .registerKryoClasses(Array(classOf[SearchMovie]))
         val spark = SparkSession.builder().config(sparkConf).getOrCreate()
