@@ -51,8 +51,7 @@ object App001 {
                 HBaseUtil.addRowData(STATIC_MOVIE_TABLE_NAME, rowKey, RATE_MORE_MOVIES_COLUMN_FAMILY, k, v)
             }
         }
-        spark.close()
-        return
+
         //2.近期热门统计，按照"yyyyMM"格式选取最近的评分数据，统计评分个数
         //创建一个日期格式化工具
         val simpleDateFormat = new SimpleDateFormat("yyyyMM")
