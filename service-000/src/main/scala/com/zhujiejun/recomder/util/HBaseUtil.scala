@@ -196,7 +196,7 @@ object HBaseUtil {
             }
             }
             val rating = Rating(ratingMap("uid").toDouble.toInt, ratingMap("mid").toDouble.toInt,
-                ratingMap("score").toDouble, ratingMap("timestamp").toInt)
+                ratingMap("score").toDouble, ratingMap("timestamp").toDouble.toInt)
             ratings.append(rating)
         }
         ratings.toList
@@ -241,6 +241,6 @@ object HBaseUtil {
         /*HBaseUtil.getRatingsFromHbase(HBASE_MOVIE_TABLE_NAME, HBASE_RATING_COLUMN_FAMILY).foreach { movie =>
             println(s"---------the current movie is ${movie.toString}---------")
         }*/
-        println("665.0".toDouble.toInt)
+        println("9.93346386E8".toDouble)
     }
 }
