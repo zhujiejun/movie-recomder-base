@@ -9,10 +9,12 @@ import org.apache.spark.sql.SparkSession
 
 object App000 {
     def storeDataInHabse(rowKey: String, columnFamily: String, column: String, value: String): Unit = {
-        println(s"----------the rowKey: $rowKey columnFamily: $columnFamily column: $column value: $value----------")
+        //println(s"----------the rowKey: $rowKey columnFamily: $columnFamily column: $column value: $value----------")
         if (!HBaseUtil.isTableExist(HBASE_MOVIE_TABLE_NAME)) {
+            println(s"----------the table $HBASE_MOVIE_TABLE_NAME existed----------")
             HBaseUtil.createTable(HBASE_MOVIE_TABLE_NAME, columnFamily)
         }
+        //println(s"----------start save data to $HBASE_MOVIE_TABLE_NAME in Hbase----------")
         HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, columnFamily, column, value)
     }
 
@@ -22,8 +24,8 @@ object App000 {
 
         val sparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_001_NAME)
         sparkConf
-            .set("spark.submit.deployMode", "cluster")
-            .set("spark.jars", DRIVER_PATH)
+            /*.set("spark.submit.deployMode", "cluster")
+            .set("spark.jars", DRIVER_PATH)*/
             .set("spark.driver.cores", "6")
             .set("spark.driver.memory", "512m")
             .set("spark.executor.cores", "6")
