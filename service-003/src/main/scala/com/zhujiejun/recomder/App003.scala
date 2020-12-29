@@ -1,7 +1,7 @@
 package com.zhujiejun.recomder
 
 import com.zhujiejun.recomder.cons.Const._
-import com.zhujiejun.recomder.data.{MovieRecs, MovieSearch, RatingSearch, TagSearch}
+import com.zhujiejun.recomder.data._
 import com.zhujiejun.recomder.util.{ConnHelper, HBaseUtil}
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
@@ -23,15 +23,16 @@ object App003 {
     }
 
     def getTopSimMovies(num: Int, mid: Int, uid: Int, simMovies: scala.collection.Map
-        [Int, scala.collection.immutable.Map[Int, Double]])(implicit mongoConfig: MongoConfig): Array[Int] = {
+        [Int, scala.collection.immutable.Map[Int, Double]]): Array[Int] = {
         //1.从相似度矩阵中拿到所有相似的电影
         val allSimMovies = simMovies(mid).toArray
-        //2.从mongodb中查询用户已看过的电影
-        val ratingExist = ConnHelper.mongoClient(mongoConfig.db)(MONGODB_RATING_COLLECTION)
-            .find(MongoDBObject("uid" -> uid))
-            .toArray
+        //2.从HBase中查询用户已看过的电影
+        val ratings: List[Rating] = HBaseUtil.getRatingsFromHbase(HBASE_MOVIE_TABLE_NAME, HBASE_RATING_COLUMN_FAMILY)
+        val ratingExist = ratings.filter { r =>
+            r.uid == uid
+        }.toArray
             .map { item =>
-                item.get("mid").toString.toInt
+                item.mid.toString.toInt
             }
         //3.把看过的过滤,得到输出列表
         allSimMovies.filter(x => !ratingExist.contains(x._1))
@@ -45,7 +46,7 @@ object App003 {
                                [Int, Double]]): Array[(Int, Double)] = {
         //定义一个ArrayBuffer,用于保存每一个备选电影的基础得分
         val scores = scala.collection.mutable.ArrayBuffer[(Int, Double)]()
-        //定义一个HashMap,保存每一个备选电影的增强减弱因子
+        //定义一个HashMap,保存每一个备选电影的增强/减弱因子
         val increMap = scala.collection.mutable.HashMap[Int, Int]()
         val decreMap = scala.collection.mutable.HashMap[Int, Int]()
         for (candidateMovie <- candidateMovies; userRecentlyRating <- userRecentlyRatings) {
@@ -62,9 +63,10 @@ object App003 {
             }
         }
         //根据备选电影的mid做groupby,根据公式去求最后的推荐评分
-        scores.groupBy(_._1).map { //groupBy之后得到的数据 Map( mid -> ArrayBuffer[(mid, score)] )
+        scores.groupBy(_._1).map { //groupBy之后得到的数据Map(mid -> ArrayBuffer[(mid, score)])
             case (mid, scoreList) =>
-                (mid, scoreList.map(_._2).sum / scoreList.length + log(increMap.getOrDefault(mid, 1))
+                (mid, scoreList.map(_._2).sum / scoreList.length
+                    + log(increMap.getOrDefault(mid, 1))
                     - log(decreMap.getOrDefault(mid, 1)))
         }.toArray.sortWith(_._2 > _._2)
     }
