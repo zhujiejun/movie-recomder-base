@@ -23,7 +23,7 @@ object App002 {
             .set("spark.driver.cores", "6")
             .set("spark.driver.memory", "512m")
             .set("spark.executor.cores", "6")
-            .set("spark.executor.memory", "1g")
+            .set("spark.executor.memory", "2g")
             .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
             .registerKryoClasses(Array(classOf[MovieSearch], classOf[RatingSearch], classOf[TagSearch]))
         val spark = SparkSession.builder().config(sparkConf).getOrCreate()
@@ -59,20 +59,15 @@ object App002 {
                 case (uid, recs) => UserRecs(uid, recs.toList.sortWith(_._2 > _._2).take(USER_MAX_RECOMMENDATION)
                     .map(x => Recommendation(x._1, x._2)))
             }.toDF().rdd
-        userRecsRDD.foreach { item =>
-            var (uid, mid, score) = ("", "", "")
-            USER_RECS_fIELD_NAMES.foreach {
-                case "uid" =>
-                    uid = item.get(0).toString
-                case "mid" =>
-                    val recs1: Recommendation = item.get(1)[Recommendation]
-                    mid = recs1.mid.toString
-                case "score" =>
-                    val recs2: Recommendation = item.get(1)[Recommendation]
-                    score = recs2.score.toString
-                case _ => println
-            }
-            HBaseUtil.addRowData(OFFLINE_MOVIE_TABLE_NAME, uid, USER_RECS_COLUMN_FAMILY, mid, score)
+        userRecsRDD.foreach {
+            case userRecs: UserRecs =>
+                val rowKey = userRecs.uid.toString
+                userRecs.recs.foreach { item =>
+                    val mid = item.mid.toString
+                    val score = item.score.toString
+                    HBaseUtil.addRowData(OFFLINE_MOVIE_TABLE_NAME, rowKey, USER_RECS_COLUMN_FAMILY, mid, score)
+                }
+            case _ => println
         }
 
 
@@ -97,20 +92,15 @@ object App002 {
                 case (mid, items) => MovieRecs(mid, items.toList.sortWith(_._2 > _._2)
                     .map(x => Recommendation(x._1, x._2)))
             }.toDF().rdd
-        movieRecsRDD.foreach { item =>
-            var (mid0, mid1, score) = ("", "", "")
-            MOVIE_RECS_fIELD_NAMES.foreach {
-                case "mid0" =>
-                    mid0 = item.get(0).toString
-                case "mid1" =>
-                    val recs1: Recommendation = item.get(1)[Recommendation]
-                    mid1 = recs1.mid.toString
-                case "score" =>
-                    val recs2: Recommendation = item.get(1)[Recommendation]
-                    score = recs2.score.toString
-                case _ => println
-            }
-            HBaseUtil.addRowData(OFFLINE_MOVIE_TABLE_NAME, mid0, MOVIE_RECS_COLUMN_FAMILY, mid1, score)
+        movieRecsRDD.foreach {
+            case movieRecs: MovieRecs =>
+                val rowKey = movieRecs.mid.toString
+                movieRecs.recs.foreach { item =>
+                    val mid = item.mid.toString
+                    val score = item.score.toString
+                    HBaseUtil.addRowData(OFFLINE_MOVIE_TABLE_NAME, rowKey, MOVIE_RECS_COLUMN_FAMILY, mid, score)
+                }
+            case _ => println
         }
 
         spark.close()
