@@ -1,0 +1,11 @@
+project(':service-004') {
+    dependencies {
+        implementation project(':service-000')
+        implementation 'org.scala-lang:scala-library'
+        implementation 'org.apache.hbase:hbase-server'
+        implementation 'org.apache.hbase:hbase-client'
+        implementation 'org.apache.kafka:kafka-streams'
+        implementation 'org.apache.kafka:kafka-clients'
+    }
+}
+mainClassName = 'com.zhujiejun.recomder.App004'
