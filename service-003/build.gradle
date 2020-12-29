@@ -1,5 +1,6 @@
 project(':service-003') {
     dependencies {
+        implementation 'redis.clients:jedis'
         implementation project(':service-000')
         implementation 'org.scala-lang:scala-library'
         implementation 'org.apache.hbase:hbase-server'

@@ -5,6 +5,7 @@ project(':service-000') {
         implementation 'org.apache.hbase:hbase-client'
         implementation 'org.apache.spark:spark-core_2.12'
         implementation 'org.apache.spark:spark-sql_2.12'
+        implementation 'org.apache.kafka:kafka-clients'
     }
 }
 mainClassName = 'com.zhujiejun.recomder.App000'

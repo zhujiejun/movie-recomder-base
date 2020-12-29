@@ -1,5 +1,7 @@
 package com.zhujiejun.recomder.cons
 
+import org.apache.kafka.common.serialization.StringDeserializer
+
 object Const {
     val SERVICE_000_NAME = "data-loader"
     val SERVICE_001_NAME = "statistics-recommender"
@@ -20,8 +22,17 @@ object Const {
     val HBASE_ZOOKEEPER_PROPERTY_CLIENTPORT = "2181"
 
     val CONFIG = Map(
-        "spark.cores" -> "local[*]",
-        "kafka.topic" -> "sfb_recomder"
+        "spark.cores" -> "local[*]"
+    )
+
+    // 定义kafka连接参数
+    val KAFKA_PARAM = Map(
+        "group.id" -> "recommender",
+        "kafka.topic" -> "sfb_recomder",
+        "auto.offset.reset" -> "latest",
+        "bootstrap.servers" -> "node101:9092",
+        "key.deserializer" -> classOf[StringDeserializer],
+        "value.deserializer" -> classOf[StringDeserializer]
     )
 
     //000原始数据表的名称

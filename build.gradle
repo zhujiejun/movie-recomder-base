@@ -62,6 +62,7 @@ subprojects {
     dependencyManagement {
         dependencies {
             dependency "org.jblas:jblas:${jblasVersion}"
+            dependency "redis.clients:jedis:${redisVersion}"
             dependency "org.scala-lang:scala-library:${scalaVersion}"
             dependency "org.apache.hbase:hbase-server:${hbaseVersion}"
             dependency "org.apache.hbase:hbase-client:${hbaseVersion}"
