@@ -17,7 +17,7 @@ object App002 {
     }
 
     def main(args: Array[String]): Unit = {
-        val sparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_001_NAME)
+        val sparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_002_NAME)
         sparkConf
             /*.set("spark.submit.deployMode", "cluster")
             .set("spark.jars", DRIVER_PATH)*/
