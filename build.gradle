@@ -61,6 +61,7 @@ subprojects {
 
     dependencyManagement {
         dependencies {
+            dependency "org.jblas:jblas:${jblasVersion}"
             dependency "org.scala-lang:scala-library:${scalaVersion}"
             dependency "org.apache.hbase:hbase-server:${hbaseVersion}"
             dependency "org.apache.hbase:hbase-client:${hbaseVersion}"
@@ -69,7 +70,8 @@ subprojects {
             dependency "org.apache.spark:spark-streaming_2.12:${sparkVersion}"
             dependency "org.apache.spark:spark-mllib_2.12:${sparkVersion}"
             dependency "org.apache.spark:spark-graphx_2.12:${sparkVersion}"
-            dependency "org.jblas:jblas:${jblasVersion}"
+            dependency "org.apache.kafka:kafka-clients:${kafkaVersion}"
+            dependency "org.apache.spark:spark-streaming-kafka-0-10_2.12:${sparkVersion}"
         }
     }
 }

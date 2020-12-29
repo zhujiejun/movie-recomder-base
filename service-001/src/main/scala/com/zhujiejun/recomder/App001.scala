@@ -38,21 +38,17 @@ object App001 {
 
         //不同的统计推荐结果
         //1.历史热门统计,历史评分数据最多,mid,count
-        val rateMoreMoviesRDD = spark.sql("select mid, count(mid) count from ratings_tmp group by mid").rdd
+        val rateMoreMoviesDS = spark.sql("select mid, count(mid) count from ratings_tmp group by mid").as[RateMoreMovie]
         //把结果写入对应的HBase表中
-        rateMoreMoviesRDD.foreach { item =>
+        rateMoreMoviesDS.foreach { item =>
             val rowKey = RandomStringUtils.randomAlphanumeric(18)
-            RATE_MORE_MOVIES_fIELD_NAMES.foreach { k =>
-                val v = k match {
-                    case "mid" => item.get(0).toString
-                    case "count" => item.get(1).toString
-                    case _ => ""
-                }
-                HBaseUtil.addRowData(STATIC_MOVIE_TABLE_NAME, rowKey, RATE_MORE_MOVIES_COLUMN_FAMILY, k, v)
-            }
+            val mid = item.mid.toString
+            val count = item.count.toString
+            HBaseUtil.addRowData(STATIC_MOVIE_TABLE_NAME, rowKey, RATE_MORE_MOVIES_COLUMN_FAMILY, "mid", mid)
+            HBaseUtil.addRowData(STATIC_MOVIE_TABLE_NAME, rowKey, RATE_MORE_MOVIES_COLUMN_FAMILY, "count", count)
         }
 
-        //2.近期热门统计，按照"yyyyMM"格式选取最近的评分数据，统计评分个数
+        //2.近期热门统计,按照"yyyyMM"格式选取最近的评分数据,统计评分个数
         //创建一个日期格式化工具
         val simpleDateFormat = new SimpleDateFormat("yyyyMM")
         //注册udf,把时间戳转换成年月格式
@@ -61,35 +57,28 @@ object App001 {
         val ratingOfYearMonthDF = spark.sql("select mid, score, changeDate(timestamp) yearmonth from ratings_tmp")
         ratingOfYearMonthDF.createOrReplaceTempView("rating_of_Month")
         //从ratingOfMonth中查找电影在各个月份的评分,mid,count,yearmonth
-        val rateMoreRecentlyMoviesRDD = spark.sql("select mid, count(mid) count, yearmonth from rating_of_Month " +
-            "group by yearmonth, mid order by yearmonth desc, count desc").rdd
+        val rateMoreRecentlyMoviesDS = spark.sql("select mid, count(mid) count, yearmonth from rating_of_Month " +
+            "group by yearmonth, mid order by yearmonth desc, count desc").as[RateMoreRecentlyMovie]
         //把结果写入对应的HBase表中
-        rateMoreRecentlyMoviesRDD.foreach { item =>
+        rateMoreRecentlyMoviesDS.foreach { item =>
             val rowKey = RandomStringUtils.randomAlphanumeric(18)
-            RATE_MORE_RECENTLY_MOVIES_fIELD_NAMES.foreach { k =>
-                val v = k match {
-                    case "mid" => item.get(0).toString
-                    case "count" => item.get(1).toString
-                    case "yearmonth" => item.get(2).toString
-                    case _ => ""
-                }
-                HBaseUtil.addRowData(STATIC_MOVIE_TABLE_NAME, rowKey, RATE_MORE_RECENTLY_MOVIES_COLUMN_FAMILY, k, v)
-            }
+            val mid = item.mid.toString
+            val count = item.count.toString
+            val yearmonth = item.yearmonth.toString
+            HBaseUtil.addRowData(STATIC_MOVIE_TABLE_NAME, rowKey, RATE_MORE_RECENTLY_MOVIES_COLUMN_FAMILY, "mid", mid)
+            HBaseUtil.addRowData(STATIC_MOVIE_TABLE_NAME, rowKey, RATE_MORE_RECENTLY_MOVIES_COLUMN_FAMILY, "count", count)
+            HBaseUtil.addRowData(STATIC_MOVIE_TABLE_NAME, rowKey, RATE_MORE_RECENTLY_MOVIES_COLUMN_FAMILY, "yearmonth", yearmonth)
         }
 
         //3.优质电影统计,统计电影的平均评分,mid,avg
-        val averageMoviesDF = spark.sql("select mid, avg(score) avg from ratings_tmp group by mid")
+        val averageMoviesDS = spark.sql("select mid, avg(score) avg from ratings_tmp group by mid").as[AverageMovie]
         //把结果写入对应的HBase表中
-        averageMoviesDF.rdd.foreach { item =>
+        averageMoviesDS.foreach { item =>
             val rowKey = RandomStringUtils.randomAlphanumeric(18)
-            AVERAGE_MOVIES_fIELD_NAMES.foreach { k =>
-                val v = k match {
-                    case "mid" => item.get(0).toString
-                    case "avg" => item.get(1).toString
-                    case _ => ""
-                }
-                HBaseUtil.addRowData(STATIC_MOVIE_TABLE_NAME, rowKey, AVERAGE_MOVIES_COLUMN_FAMILY, k, v)
-            }
+            val mid = item.mid.toString
+            val avg = item.avg.toString
+            HBaseUtil.addRowData(STATIC_MOVIE_TABLE_NAME, rowKey, AVERAGE_MOVIES_COLUMN_FAMILY, "mid", mid)
+            HBaseUtil.addRowData(STATIC_MOVIE_TABLE_NAME, rowKey, AVERAGE_MOVIES_COLUMN_FAMILY, "avg", avg)
         }
 
         //4.各类别电影Top统计,mid,avg
@@ -98,11 +87,11 @@ object App001 {
             "Drama", "Family", "Fantasy", "Foreign", "History", "Horror", "Music", "Mystery",
             "Romance", "Science", "Tv", "Thriller", "War", "Western")
         //把平均评分加入movie表里,加一列,inner join
-        val movieWithScoreDF = movieDF.join(averageMoviesDF.toDF(), "mid")
+        val movieWithScoreDF = movieDF.join(averageMoviesDS.toDF(), "mid")
         //为做笛卡尔积,把genres转成rdd
         val genresRDD = spark.sparkContext.makeRDD(genres)
         //计算类别top10,首先对类别和电影做笛卡尔积
-        val genresTopMoviesRDD = genresRDD.cartesian(movieWithScoreDF.rdd)
+        val genresTopMoviesDS = genresRDD.cartesian(movieWithScoreDF.rdd)
             .filter {
                 //条件过滤,找出movie的字段genres值(Action|Adventure|Sci-Fi)包含当前类别genre(Action)的那些
                 case (genre, movieRow) => movieRow.getAs[String]("genres").toLowerCase.contains(genre.toLowerCase)
@@ -114,20 +103,18 @@ object App001 {
             .map {
                 case (genre, items) => GenresRecommendation(genre, items.toList.sortWith(_._2 > _._2).take(10)
                     .map(item => Recommendation(item._1, item._2)))
-            }.toDF().rdd
+            }.toDS()
         //把结果写入对应的HBase表中
-        genresTopMoviesRDD.foreach { item =>
-            val rowKey = RandomStringUtils.randomAlphanumeric(18)
-            GENRES_TOP_MOVIES_fIELD_NAMES.foreach { k =>
-                val v = k match {
-                    case "genres" => item.get(0).toString
-                    case "recs" => item.get(1).toString
-                    case _ => ""
-                }
-                HBaseUtil.addRowData(STATIC_MOVIE_TABLE_NAME, rowKey, GENRES_TOP_MOVIES_COLUMN_FAMILY, k, v)
+        genresTopMoviesDS.foreach { item =>
+            val rowKey = item.genres
+            item.recs.foreach { recomder =>
+                val mid = recomder.mid.toString
+                val score = recomder.score.toString
+                HBaseUtil.addRowData(STATIC_MOVIE_TABLE_NAME, rowKey, GENRES_TOP_MOVIES_COLUMN_FAMILY, mid, score)
             }
         }
 
         spark.close()
     }
+
 }

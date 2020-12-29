@@ -2,7 +2,7 @@ package com.zhujiejun.recomder.util
 
 import com.google.common.collect.Lists
 import com.zhujiejun.recomder.cons.Const._
-import com.zhujiejun.recomder.data.{Movie, Rating, Tag}
+import com.zhujiejun.recomder.data.{Movie, MovieRecs, Rating, Recommendation, Tag}
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.util.Bytes
@@ -12,6 +12,7 @@ import org.slf4j.{Logger, LoggerFactory}
 
 import java.util
 import scala.collection.JavaConversions._
+import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 @SuppressWarnings(Array("unused", "deprecation"))
@@ -202,6 +203,31 @@ object HBaseUtil {
         ratings.toList
     }
 
+    @throws[Throwable]
+    def getMovieRecsFromHbase(tableName: String, family: String): List[MovieRecs] = {
+        val movieRecses: ListBuffer[MovieRecs] = new ListBuffer[MovieRecs]
+        val table = CONNECTION.getTable(TableName.valueOf(tableName))
+        val resultScanner = table.getScanner(Bytes.toBytes(family))
+        resultScanner.foreach { result =>
+            val cells = result.rawCells()
+            var movieRecsMap: Map[String, String] = Map()
+            cells.foreach { cell => {
+                val column = Bytes.toString(CellUtil.cloneQualifier(cell))
+                val value = Bytes.toString(CellUtil.cloneValue(cell))
+                column match {
+                    case "mid" => movieRecsMap += ("mid" -> value)
+                    case "recs" => movieRecsMap += ("recs" -> value)
+                    case _ => ""
+                }
+            }
+            }
+            //movieRecsMap("recs")
+            val movieRecs = MovieRecs(movieRecsMap("mid").toDouble.toInt, null) //todo
+            movieRecses.append(movieRecs)
+        }
+        movieRecses.toList
+    }
+
     def checkTableExistInHabse(tableName: String): Unit = {
         tableName match {
             case HBASE_MOVIE_TABLE_NAME =>
@@ -246,6 +272,8 @@ object HBaseUtil {
         /*HBaseUtil.getRatingsFromHbase(HBASE_MOVIE_TABLE_NAME, HBASE_RATING_COLUMN_FAMILY).foreach { movie =>
             println(s"---------the current movie is ${movie.toString}---------")
         }*/
-        println("9.93346386E8".toDouble)
+        //println("9.93346386E8".toDouble)
+        val movieRecs = MovieRecs(10000, Array(Recommendation(10001, 0.9737d), Recommendation(10001, 0.9737d)))
+        println(movieRecs.toString)
     }
 }
