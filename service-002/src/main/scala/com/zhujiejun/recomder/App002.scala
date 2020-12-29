@@ -4,7 +4,6 @@ import com.zhujiejun.recomder.cons.Const._
 import com.zhujiejun.recomder.data._
 import com.zhujiejun.recomder.util.HBaseUtil
 import com.zhujiejun.recomder.util.HBaseUtil.checkTableExistInHabse
-import org.apache.commons.lang3.RandomStringUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.mllib.recommendation.{ALS, Rating => MLRating}
 import org.apache.spark.sql.SparkSession
@@ -61,15 +60,19 @@ object App002 {
                     .map(x => Recommendation(x._1, x._2)))
             }.toDF().rdd
         userRecsRDD.foreach { item =>
-            val rowKey = RandomStringUtils.randomAlphanumeric(18)
-            USER_RECS_fIELD_NAMES.foreach { k =>
-                val v = k match {
-                    case "uid" => item.get(0).toString
-                    case "recs" => item.get(1).toString
-                    case _ => ""
-                }
-                HBaseUtil.addRowData(OFFLINE_MOVIE_TABLE_NAME, rowKey, USER_RECS_COLUMN_FAMILY, k, v)
+            var (uid, mid, score) = ("", "", "")
+            USER_RECS_fIELD_NAMES.foreach {
+                case "uid" =>
+                    uid = item.get(0).toString
+                case "mid" =>
+                    val recs1: Recommendation = item.get(1)[Recommendation]
+                    mid = recs1.mid.toString
+                case "score" =>
+                    val recs2: Recommendation = item.get(1)[Recommendation]
+                    score = recs2.score.toString
+                case _ => println
             }
+            HBaseUtil.addRowData(OFFLINE_MOVIE_TABLE_NAME, uid, USER_RECS_COLUMN_FAMILY, mid, score)
         }
 
 
@@ -95,15 +98,19 @@ object App002 {
                     .map(x => Recommendation(x._1, x._2)))
             }.toDF().rdd
         movieRecsRDD.foreach { item =>
-            val rowKey = RandomStringUtils.randomAlphanumeric(18)
-            MOVIE_RECS_fIELD_NAMES.foreach { k =>
-                val v = k match {
-                    case "mid" => item.get(0).toString
-                    case "recs" => item.get(1).toString
-                    case _ => ""
-                }
-                HBaseUtil.addRowData(OFFLINE_MOVIE_TABLE_NAME, rowKey, MOVIE_RECS_COLUMN_FAMILY, k, v)
+            var (mid0, mid1, score) = ("", "", "")
+            MOVIE_RECS_fIELD_NAMES.foreach {
+                case "mid0" =>
+                    mid0 = item.get(0).toString
+                case "mid1" =>
+                    val recs1: Recommendation = item.get(1)[Recommendation]
+                    mid1 = recs1.mid.toString
+                case "score" =>
+                    val recs2: Recommendation = item.get(1)[Recommendation]
+                    score = recs2.score.toString
+                case _ => println
             }
+            HBaseUtil.addRowData(OFFLINE_MOVIE_TABLE_NAME, mid0, MOVIE_RECS_COLUMN_FAMILY, mid1, score)
         }
 
         spark.close()
