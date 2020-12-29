@@ -47,7 +47,7 @@ object App002 {
         val userMoviesRDD = userRDD.cartesian(movieRDD)
         //调用model的predict方法预测评分
         val preRatings = model.predict(userMoviesRDD)
-        val userRecsRDD = preRatings
+        val userRecsDS = preRatings
             .filter {
                 _.rating > 0 //过滤出评分大于0的项
             }
@@ -58,16 +58,14 @@ object App002 {
             .map {
                 case (uid, recs) => UserRecs(uid, recs.toList.sortWith(_._2 > _._2).take(USER_MAX_RECOMMENDATION)
                     .map(x => Recommendation(x._1, x._2)))
-            }.toDF().rdd
-        userRecsRDD.foreach {
-            case userRecs: UserRecs =>
-                val rowKey = userRecs.uid.toString
-                userRecs.recs.foreach { item =>
-                    val mid = item.mid.toString
-                    val score = item.score.toString
-                    HBaseUtil.addRowData(OFFLINE_MOVIE_TABLE_NAME, rowKey, USER_RECS_COLUMN_FAMILY, mid, score)
-                }
-            case _ => println
+            }.toDS()
+        userRecsDS.foreach { userRecs =>
+            val rowKey = userRecs.uid.toString
+            userRecs.recs.foreach { item =>
+                val mid = item.mid.toString
+                val score = item.score.toString
+                HBaseUtil.addRowData(OFFLINE_MOVIE_TABLE_NAME, rowKey, USER_RECS_COLUMN_FAMILY, mid, score)
+            }
         }
 
 
@@ -76,7 +74,7 @@ object App002 {
             case (mid, features) => (mid, new DoubleMatrix(features))
         }
         //对所有电影两两计算它们的相似度，先做笛卡尔积
-        val movieRecsRDD = movieFeaturesRDD.cartesian(movieFeaturesRDD)
+        val movieRecsDS = movieFeaturesRDD.cartesian(movieFeaturesRDD)
             .filter {
                 case (a, b) => a._1 != b._1 //把自己跟自己的配对过滤掉
             }
@@ -91,16 +89,14 @@ object App002 {
             .map {
                 case (mid, items) => MovieRecs(mid, items.toList.sortWith(_._2 > _._2)
                     .map(x => Recommendation(x._1, x._2)))
-            }.toDF().rdd
-        movieRecsRDD.foreach {
-            case movieRecs: MovieRecs =>
-                val rowKey = movieRecs.mid.toString
-                movieRecs.recs.foreach { item =>
-                    val mid = item.mid.toString
-                    val score = item.score.toString
-                    HBaseUtil.addRowData(OFFLINE_MOVIE_TABLE_NAME, rowKey, MOVIE_RECS_COLUMN_FAMILY, mid, score)
-                }
-            case _ => println
+            }.toDS()
+        movieRecsDS.foreach { movieRecs =>
+            val rowKey = movieRecs.mid.toString
+            movieRecs.recs.foreach { item =>
+                val mid = item.mid.toString
+                val score = item.score.toString
+                HBaseUtil.addRowData(OFFLINE_MOVIE_TABLE_NAME, rowKey, MOVIE_RECS_COLUMN_FAMILY, mid, score)
+            }
         }
 
         spark.close()
