@@ -2,17 +2,15 @@ package com.zhujiejun.recomder.util
 
 import com.google.common.collect.Lists
 import com.zhujiejun.recomder.cons.Const._
-import com.zhujiejun.recomder.data.{Movie, MovieRecs, Rating, Recommendation, Tag}
+import com.zhujiejun.recomder.data.{Movie, MovieRecs, Rating, Recommendation}
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.util.Bytes
 import org.apache.hadoop.hbase.{Cell, CellUtil, HBaseConfiguration, TableName}
-import org.apache.spark.rdd.RDD
 import org.slf4j.{Logger, LoggerFactory}
 
 import java.util
 import scala.collection.JavaConversions._
-import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 @SuppressWarnings(Array("unused", "deprecation"))
@@ -250,21 +248,6 @@ object HBaseUtil {
                 }
             case _ => println
         }
-    }
-
-    //Movie
-    def storeMovieDataInHabse(implicit data: RDD[Movie], save: RDD[Movie] => Unit): Unit = {
-        save(data)
-    }
-
-    //Rating
-    def storeRatingDataInHabse(implicit data: RDD[Rating], save: RDD[Rating] => Unit): Unit = {
-        save(data)
-    }
-
-    //Tag
-    def storeTagDataInHabse(implicit data: RDD[Tag], save: RDD[Tag] => Unit): Unit = {
-        save(data)
     }
 
     def main(args: Array[String]): Unit = {

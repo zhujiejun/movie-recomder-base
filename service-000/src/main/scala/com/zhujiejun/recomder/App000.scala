@@ -6,7 +6,6 @@ import com.zhujiejun.recomder.util.HBaseUtil
 import com.zhujiejun.recomder.util.HBaseUtil._
 import org.apache.commons.lang3.RandomStringUtils
 import org.apache.spark.SparkConf
-import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
 object App000 {
@@ -23,91 +22,50 @@ object App000 {
             .registerKryoClasses(Array(classOf[MovieSearch], classOf[RatingSearch], classOf[TagSearch]))
         val spark = SparkSession.builder().config(sparkConf).getOrCreate()
 
-        /*var classNames: String = ""
-        sparkConf.get("spark.kryo.classesToRegister").foreach { char =>
-            classNames = classNames + char
-        }
-        println(s"----------the class names is: $classNames----------")
-        spark.close()
-        return*/
-
-        //import spark.implicits._
+        import spark.implicits._
         checkTableExistInHabse(HBASE_MOVIE_TABLE_NAME)
         val movie = spark.sparkContext.textFile(MOVIE_DATA_PATH)
-        implicit val movieRDD: RDD[Movie] = movie.map(item => {
+        movie.map(item => {
             val attr = item.split("\\^")
             Movie(attr(0).toInt, attr(1).trim, attr(2).trim, attr(3).trim, attr(4).trim,
                 attr(5).trim, attr(6).trim, attr(7).trim, attr(8).trim, attr(9).trim)
-        })
-
-        implicit def movieSaveToHbase(data: RDD[Movie]): Unit = {
-            data.foreach(movie => {
-                val rowKey = RandomStringUtils.randomAlphanumeric(18)
-                MOVIE_fIELD_NAMES.foreach { k =>
-                    val v = k match {
-                        case "mid" => movie.mid
-                        case "name" => movie.name
-                        case "descri" => movie.descri
-                        case "timelong" => movie.timelong
-                        case "issue" => movie.issue
-                        case "shoot" => movie.shoot
-                        case "language" => movie.language
-                        case "genres" => movie.genres
-                        case "actors" => movie.actors
-                        case "directors" => movie.directors
-                    }
-                    HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_MOVIE_COLUMN_FAMILY, k, v.toString)
-                }
-            })
+        }).toDS().foreach { item =>
+            val rowKey = RandomStringUtils.randomAlphanumeric(18)
+            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_MOVIE_COLUMN_FAMILY, "mid", item.mid.toString)
+            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_MOVIE_COLUMN_FAMILY, "name", item.name)
+            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_MOVIE_COLUMN_FAMILY, "descri", item.descri)
+            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_MOVIE_COLUMN_FAMILY, "timelong", item.timelong)
+            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_MOVIE_COLUMN_FAMILY, "issue", item.issue)
+            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_MOVIE_COLUMN_FAMILY, "shoot", item.shoot)
+            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_MOVIE_COLUMN_FAMILY, "language", item.language)
+            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_MOVIE_COLUMN_FAMILY, "genres", item.genres)
+            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_MOVIE_COLUMN_FAMILY, "actors", item.actors)
+            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_MOVIE_COLUMN_FAMILY, "directors", item.directors)
         }
-
-        storeMovieDataInHabse
 
         val rating = spark.sparkContext.textFile(RATING_DATA_PATH)
-        implicit val ratingRDD: RDD[Rating] = rating.map(item => {
+        rating.map(item => {
             val attr = item.split(",")
             Rating(attr(0).toInt, attr(1).toInt, attr(2).toDouble, attr(3).toInt)
-        })
-
-        implicit def ratingSaveToHbase(data: RDD[Rating]): Unit = {
-            data.foreach(rating => {
-                val rowKey = RandomStringUtils.randomAlphanumeric(18)
-                RATING_fIELD_NAMES.foreach { k =>
-                    val v = k match {
-                        case "uid" => rating.uid
-                        case "mid" => rating.mid
-                        case "score" => rating.score
-                        case "timestamp" => rating.timestamp
-                    }
-                    HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_RATING_COLUMN_FAMILY, k, v.toString)
-                }
-            })
+        }).toDS().foreach { item =>
+            val rowKey = RandomStringUtils.randomAlphanumeric(18)
+            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_RATING_COLUMN_FAMILY, "uid", item.uid.toString)
+            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_RATING_COLUMN_FAMILY, "mid", item.mid.toString)
+            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_RATING_COLUMN_FAMILY, "score", item.score.toString)
+            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_RATING_COLUMN_FAMILY, "timestamp", item.timestamp.toString)
         }
-
-        storeRatingDataInHabse
 
         val tag = spark.sparkContext.textFile(TAG_DATA_PATH)
-        implicit val tagRDD: RDD[Tag] = tag.map(item => {
+        tag.map(item => {
             val attr = item.split(",")
             Tag(attr(0).toInt, attr(1).toInt, attr(2).trim, attr(3).toInt)
-        })
-
-        implicit def tagSaveToHbase(data: RDD[Tag]): Unit = {
-            data.foreach(tag => {
-                val rowKey = RandomStringUtils.randomAlphanumeric(18)
-                TAG_fIELD_NAMES.foreach { k =>
-                    val v = k match {
-                        case "uid" => tag.uid
-                        case "mid" => tag.mid
-                        case "tag" => tag.tag
-                        case "timestamp" => tag.timestamp
-                    }
-                    HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_TAG_COLUMN_FAMILY, k, v.toString)
-                }
-            })
+        }).toDS().foreach { item =>
+            val rowKey = RandomStringUtils.randomAlphanumeric(18)
+            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_TAG_COLUMN_FAMILY, "tag", item.tag)
+            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_TAG_COLUMN_FAMILY, "uid", item.uid.toString)
+            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_TAG_COLUMN_FAMILY, "mid", item.mid.toString)
+            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_TAG_COLUMN_FAMILY, "timestamp", item.timestamp.toString)
         }
-
-        storeTagDataInHabse
 
         spark.stop()
     }
