@@ -2,7 +2,7 @@ package com.zhujiejun.recomder
 
 import com.zhujiejun.recomder.cons.Const._
 import com.zhujiejun.recomder.data.{MovieRecs, MovieSearch, RatingSearch, TagSearch}
-import com.zhujiejun.recomder.util.HBaseUtil
+import com.zhujiejun.recomder.util.{ConnHelper, HBaseUtil}
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.kafka010.{ConsumerStrategies, KafkaUtils, LocationStrategies}
@@ -10,11 +10,6 @@ import org.apache.spark.streaming.{Seconds, StreamingContext}
 import redis.clients.jedis.Jedis
 
 import scala.collection.JavaConversions._
-
-//定义连接助手对象,序列化
-object ConnHelper extends Serializable {
-    lazy val jedis = new Jedis("node101")
-}
 
 @SuppressWarnings("all")
 object App003 {
