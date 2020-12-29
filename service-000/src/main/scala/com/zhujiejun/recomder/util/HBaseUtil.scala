@@ -143,12 +143,10 @@ object HBaseUtil {
         val table = CONNECTION.getTable(TableName.valueOf(tableName))
         val resultScanner = table.getScanner(Bytes.toBytes(family))
         resultScanner.foreach { result =>
-            val cells = result.rawCells()
             var movieMap: Map[String, String] = Map()
-            cells.foreach { cell => {
+            result.rawCells().foreach { cell => {
                 val column = Bytes.toString(CellUtil.cloneQualifier(cell))
                 val value = Bytes.toString(CellUtil.cloneValue(cell))
-                //println(s"----------the column: $column  and value: $value----------")
                 column match {
                     case "mid" => movieMap += ("mid" -> value)
                     case "name" => movieMap += ("name" -> value)
@@ -164,7 +162,6 @@ object HBaseUtil {
                 }
             }
             }
-            println
             val movie = Movie(movieMap("mid").toInt, movieMap("name"), movieMap("descri"),
                 movieMap("timelong"), movieMap("issue"), movieMap("shoot"), movieMap("language"),
                 movieMap("genres"), movieMap("actors"), movieMap("directors"))
@@ -180,9 +177,8 @@ object HBaseUtil {
         val table = CONNECTION.getTable(TableName.valueOf(tableName))
         val resultScanner = table.getScanner(Bytes.toBytes(family))
         resultScanner.foreach { result =>
-            val cells = result.rawCells()
             var ratingMap: Map[String, String] = Map()
-            cells.foreach { cell => {
+            result.rawCells().foreach { cell => {
                 val column = Bytes.toString(CellUtil.cloneQualifier(cell))
                 val value = Bytes.toString(CellUtil.cloneValue(cell))
                 column match {
@@ -207,20 +203,18 @@ object HBaseUtil {
         val table = CONNECTION.getTable(TableName.valueOf(tableName))
         val resultScanner = table.getScanner(Bytes.toBytes(family))
         resultScanner.foreach { result =>
-            val cells = result.rawCells()
             var movieRecsMap: Map[String, String] = Map()
-            cells.foreach { cell => {
-                val column = Bytes.toString(CellUtil.cloneQualifier(cell))
-                val value = Bytes.toString(CellUtil.cloneValue(cell))
-                column match {
-                    case "mid" => movieRecsMap += ("mid" -> value)
-                    case "recs" => movieRecsMap += ("recs" -> value)
-                    case _ => ""
-                }
+            result.rawCells().foreach { cell => {
+                val rowKey = Bytes.toString(CellUtil.cloneRow(cell))
+                movieRecsMap += ("mid0" -> rowKey)
+                val mid1 = Bytes.toString(CellUtil.cloneQualifier(cell))
+                val score = Bytes.toString(CellUtil.cloneValue(cell))
+                movieRecsMap += (mid1 -> score)
             }
             }
-            //movieRecsMap("recs")
-            val movieRecs = MovieRecs(movieRecsMap("mid").toDouble.toInt, null) //todo
+            val mid0 = movieRecsMap("mid0").toDouble.toInt
+            val recomders = for ((k, v) <- movieRecsMap) yield Recommendation(k.toInt, v.toDouble)
+            val movieRecs = MovieRecs(mid0, recomders.toSeq)
             movieRecses.append(movieRecs)
         }
         movieRecses.toList
