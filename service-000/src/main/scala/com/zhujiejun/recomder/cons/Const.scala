@@ -22,13 +22,13 @@ object Const {
     val HBASE_ZOOKEEPER_PROPERTY_CLIENTPORT = "2181"
 
     val CONFIG = Map(
-        "spark.cores" -> "local[*]"
+        "spark.cores" -> "local[*]",
+        "kafka.topic" -> "sfb_recomder"
     )
 
     // 定义kafka连接参数
     val KAFKA_PARAM = Map(
         "group.id" -> "recommender",
-        "kafka.topic" -> "sfb_recomder",
         "auto.offset.reset" -> "latest",
         "bootstrap.servers" -> "node101:9092",
         "key.deserializer" -> classOf[StringDeserializer],

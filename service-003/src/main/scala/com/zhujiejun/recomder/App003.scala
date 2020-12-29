@@ -22,15 +22,6 @@ object App003 {
             }.toArray
     }
 
-    /**
-     * 获取跟当前电影做相似的num个电影,作为备选电影
-     *
-     * @param num       相似电影的数量
-     * @param mid       当前电影ID
-     * @param uid       当前评分用户ID
-     * @param simMovies 相似度矩阵
-     * @return 过滤之后的备选电影列表
-     */
     def getTopSimMovies(num: Int, mid: Int, uid: Int, simMovies: scala.collection.Map
         [Int, scala.collection.immutable.Map[Int, Double]])(implicit mongoConfig: MongoConfig): Array[Int] = {
         //1.从相似度矩阵中拿到所有相似的电影
@@ -119,7 +110,7 @@ object App003 {
         val simMovieMatrixBroadCast = sparkContext.broadcast(simMovieMatrix)
         //通过kafka创建一个DStream
         val kafkaStream = KafkaUtils.createDirectStream[String, String](streamingContext, LocationStrategies.PreferConsistent,
-            ConsumerStrategies.Subscribe[String, String](Array(KAFKA_PARAM("kafka.topic")), KAFKA_PARAM))
+            ConsumerStrategies.Subscribe[String, String](Array(CONFIG("kafka.topic")), KAFKA_PARAM))
         //把原始数据UID|MID|SCORE|TIMESTAMP转换成评分流
         val ratingStream = kafkaStream.map { msg =>
             val attr = msg.value().split("\\|")
