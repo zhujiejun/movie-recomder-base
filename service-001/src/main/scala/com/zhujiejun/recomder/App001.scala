@@ -8,6 +8,9 @@ import org.apache.commons.lang3.RandomStringUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 
+import java.text.SimpleDateFormat
+import java.util.Date
+
 object App001 {
     def main(args: Array[String]): Unit = {
         val sparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_001_NAME)
@@ -35,7 +38,7 @@ object App001 {
 
         //不同的统计推荐结果
         //1.历史热门统计,历史评分数据最多,mid,count
-        /*val rateMoreMoviesRDD = spark.sql("select mid, count(mid) count from ratings_tmp group by mid").rdd
+        val rateMoreMoviesRDD = spark.sql("select mid, count(mid) count from ratings_tmp group by mid").rdd
         //把结果写入对应的HBase表中
         rateMoreMoviesRDD.foreach { item =>
             val rowKey = RandomStringUtils.randomAlphanumeric(18)
@@ -47,11 +50,11 @@ object App001 {
                 }
                 HBaseUtil.addRowData(STATIC_MOVIE_TABLE_NAME, rowKey, RATE_MORE_MOVIES_COLUMN_FAMILY, k, v)
             }
-        }*/
+        }
 
         //2.近期热门统计，按照"yyyyMM"格式选取最近的评分数据，统计评分个数
         //创建一个日期格式化工具
-        /*val simpleDateFormat = new SimpleDateFormat("yyyyMM")
+        val simpleDateFormat = new SimpleDateFormat("yyyyMM")
         //注册udf,把时间戳转换成年月格式
         spark.udf.register("changeDate", (x: Int) => simpleDateFormat.format(new Date(x * 1000L)).toInt)
         //对原始数据做预处理,去掉uid
@@ -72,11 +75,11 @@ object App001 {
                 }
                 HBaseUtil.addRowData(STATIC_MOVIE_TABLE_NAME, rowKey, RATE_MORE_RECENTLY_MOVIES_COLUMN_FAMILY, k, v)
             }
-        }*/
+        }
 
         //3.优质电影统计,统计电影的平均评分,mid,avg
         val averageMoviesDF = spark.sql("select mid, avg(score) avg from ratings_tmp group by mid")
-        /*//把结果写入对应的HBase表中
+        //把结果写入对应的HBase表中
         averageMoviesDF.rdd.foreach { item =>
             val rowKey = RandomStringUtils.randomAlphanumeric(18)
             AVERAGE_MOVIES_fIELD_NAMES.foreach { k =>
@@ -87,7 +90,7 @@ object App001 {
                 }
                 HBaseUtil.addRowData(STATIC_MOVIE_TABLE_NAME, rowKey, AVERAGE_MOVIES_COLUMN_FAMILY, k, v)
             }
-        }*/
+        }
 
         //4.各类别电影Top统计,mid,avg
         //定义所有类别
