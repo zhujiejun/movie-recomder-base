@@ -129,8 +129,11 @@ object App003 {
                     val candidateMovies = getTopSimMovies(MAX_SIM_MOVIES_NUM, mid, uid, simMovieMatrixBroadCast.value)
                     //3.对每个备选电影,计算推荐优先级,得到当前用户的实时推荐列表,Array[(mid, score)]
                     val streamRecs = computeMovieScores(candidateMovies, userRecentlyRatings, simMovieMatrixBroadCast.value)
-                //4.把推荐数据保存到mongodb
-                //saveDataToMongoDB(uid, streamRecs)
+                    //4.把推荐数据保存到HBase
+                    streamRecs.foreach {
+                        case (mid, avgScore) =>
+                            HBaseUtil.addRowData(STREAM_MOVIE_TABLE_NAME, uid.toString, STREAM_RECS_COLUMN_FAMILY, mid.toString, avgScore.toString)
+                    }
             }
         }
         //开始接收和处理数据
