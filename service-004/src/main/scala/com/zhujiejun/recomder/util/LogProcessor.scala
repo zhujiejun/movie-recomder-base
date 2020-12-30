@@ -11,9 +11,9 @@ class LogProcessor() extends Processor[Array[Byte], Array[Byte]] {
     }
 
     override def process(dummy: Array[Byte], line: Array[Byte]): Unit = {
-        // 把收集到的日志信息用string表示
+        //把收集到的日志信息用string表示
         var input = new String(line)
-        // 根据前缀MOVIE_RATING_PREFIX:从日志信息中提取评分数据
+        //根据前缀MOVIE_RATING_PREFIX:从日志信息中提取评分数据
         if (input.contains("MOVIE_RATING_PREFIX:")) {
             println("movie rating data coming!>>>>>>>>>>>" + input)
             input = input.split("MOVIE_RATING_PREFIX:")(1).trim
