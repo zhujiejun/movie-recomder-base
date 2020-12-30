@@ -13,8 +13,6 @@ object App002 {
     def main(args: Array[String]): Unit = {
         val sparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_002_NAME)
         sparkConf
-            /*.set("spark.submit.deployMode", "cluster")
-            .set("spark.jars", DRIVER_PATH)*/
             .set("spark.driver.cores", "6")
             .set("spark.driver.memory", "512m")
             .set("spark.executor.cores", "6")
