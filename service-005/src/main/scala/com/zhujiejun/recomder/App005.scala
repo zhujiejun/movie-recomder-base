@@ -102,6 +102,7 @@ object App005 {
         val streamingContext = new StreamingContext(sparkContext, Seconds(2))
 
         val movieRecses: List[MovieRecs] = HBaseUtil.getMovieRecsFromHbase(OFFLINE_MOVIE_TABLE_NAME, MOVIE_FEATURES_RECS_COLUMN_FAMILY)
+        //val movieRecses: List[MovieRecs] = HBaseUtil.getMovieRecsFromHbase(OFFLINE_MOVIE_TABLE_NAME, MOVIE_CONTENTS_RECS_COLUMN_FAMILY)
         val simMovieMatrix = spark.sparkContext.parallelize(movieRecses).map { movieRecs => //为了查询相似度方便,转换成map
             (movieRecs.mid, movieRecs.recs.map(x => (x.mid, x.score)).toMap)
         }.collectAsMap()
