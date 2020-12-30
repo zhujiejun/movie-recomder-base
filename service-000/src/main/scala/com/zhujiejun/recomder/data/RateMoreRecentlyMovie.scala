@@ -1,3 +1,3 @@
 package com.zhujiejun.recomder.data
 
-case class RateMoreRecentlyMovie(mid: Int, count: Int, yearmonth: Int)
+case class RateMoreRecentlyMovie(mid: Int, count: Long, yearmonth: Int)
