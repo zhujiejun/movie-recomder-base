@@ -2,17 +2,18 @@ package com.zhujiejun.recomder
 
 import com.zhujiejun.recomder.cons.Const._
 import com.zhujiejun.recomder.data._
+import com.zhujiejun.recomder.util.HBaseUtil.checkTableExistInHabse
 import com.zhujiejun.recomder.util.{ConnHelper, HBaseUtil}
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.kafka010.{ConsumerStrategies, KafkaUtils, LocationStrategies}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
-import redis.clients.jedis.Jedis
+import redis.clients.jedis.JedisCluster
 
 import scala.collection.JavaConversions._
 
 object App005 {
-    def getUserRecentlyRating(num: Int, uid: Int, jedis: Jedis): Array[(Int, Double)] = {
+    def getUserRecentlyRating(num: Int, uid: Int, jedis: JedisCluster): Array[(Int, Double)] = {
         //从redis读取数据,用户评分数据保存在 uid:UID 为key的队列里,value是 MID:SCORE
         jedis.lrange("uid:" + uid, 0, num - 1)
             .map { item => //具体每个评分又是以冒号分隔的两个值
@@ -92,7 +93,7 @@ object App005 {
         val sparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_004_NAME)
         sparkConf
             .set("spark.driver.cores", "6")
-            .set("spark.driver.memory", "512m")
+            .set("spark.driver.memory", "1g")
             .set("spark.executor.cores", "6")
             .set("spark.executor.memory", "2g")
             .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
@@ -101,8 +102,9 @@ object App005 {
         val sparkContext = spark.sparkContext
         val streamingContext = new StreamingContext(sparkContext, Seconds(2))
 
-        val movieRecses: List[MovieRecs] = HBaseUtil.getMovieRecsFromHbase(OFFLINE_MOVIE_TABLE_NAME, MOVIE_FEATURES_RECS_COLUMN_FAMILY)
-        //val movieRecses: List[MovieRecs] = HBaseUtil.getMovieRecsFromHbase(OFFLINE_MOVIE_TABLE_NAME, MOVIE_CONTENTS_RECS_COLUMN_FAMILY)
+        checkTableExistInHabse(STREAM_MOVIE_TABLE_NAME)
+        //val movieRecses: List[MovieRecs] = HBaseUtil.getMovieRecsFromHbase(OFFLINE_MOVIE_TABLE_NAME, MOVIE_FEATURES_RECS_COLUMN_FAMILY)
+        val movieRecses: List[MovieRecs] = HBaseUtil.getMovieRecsFromHbase(OFFLINE_MOVIE_TABLE_NAME, MOVIE_CONTENTS_RECS_COLUMN_FAMILY)
         val simMovieMatrix = spark.sparkContext.parallelize(movieRecses).map { movieRecs => //为了查询相似度方便,转换成map
             (movieRecs.mid, movieRecs.recs.map(x => (x.mid, x.score)).toMap)
         }.collectAsMap()

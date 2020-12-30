@@ -215,7 +215,8 @@ object HBaseUtil {
                 movieRecsMap += (mid1 -> score)
             }
             }
-            val mid0 = movieRecsMap("mid0").toDouble.toInt
+            val mid0 = movieRecsMap("mid0").toInt
+            movieRecsMap -= "mid0"
             val recomders = for ((k, v) <- movieRecsMap) yield Recommendation(k.toInt, v.toDouble)
             val movieRecs = MovieRecs(mid0, recomders.toSeq)
             movieRecses.append(movieRecs)
@@ -243,6 +244,11 @@ object HBaseUtil {
                     println(s"----------the table $OFFLINE_MOVIE_TABLE_NAME  not existed, create the table----------")
                     HBaseUtil.createTable(OFFLINE_MOVIE_TABLE_NAME, OFFLINE_USER_RECS_COLUMN_FAMILY,
                         MOVIE_FEATURES_RECS_COLUMN_FAMILY, MOVIE_CONTENTS_RECS_COLUMN_FAMILY)
+                }
+            case STREAM_MOVIE_TABLE_NAME =>
+                if (!HBaseUtil.isTableExist(STREAM_MOVIE_TABLE_NAME)) {
+                    println(s"----------the table $STREAM_MOVIE_TABLE_NAME  not existed, create the table----------")
+                    HBaseUtil.createTable(STREAM_MOVIE_TABLE_NAME, STREAM_USER_RECS_COLUMN_FAMILY)
                 }
             case _ => println
         }
