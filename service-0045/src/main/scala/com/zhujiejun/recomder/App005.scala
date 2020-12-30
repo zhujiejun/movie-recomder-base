@@ -11,7 +11,7 @@ import redis.clients.jedis.Jedis
 
 import scala.collection.JavaConversions._
 
-object App004 {
+object App005 {
     def getUserRecentlyRating(num: Int, uid: Int, jedis: Jedis): Array[(Int, Double)] = {
         //从redis读取数据,用户评分数据保存在 uid:UID 为key的队列里,value是 MID:SCORE
         jedis.lrange("uid:" + uid, 0, num - 1)
