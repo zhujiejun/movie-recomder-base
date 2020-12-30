@@ -1,15 +1,11 @@
 project(':service-003') {
     dependencies {
-        implementation 'redis.clients:jedis'
         implementation project(':service-000')
         implementation 'org.scala-lang:scala-library'
         implementation 'org.apache.hbase:hbase-server'
         implementation 'org.apache.hbase:hbase-client'
-        implementation 'org.apache.spark:spark-core_2.12'
-        implementation 'org.apache.spark:spark-sql_2.12'
-        implementation 'org.apache.spark:spark-streaming_2.12'
+        implementation 'org.apache.kafka:kafka-streams'
         implementation 'org.apache.kafka:kafka-clients'
-        implementation 'org.apache.spark:spark-streaming-kafka-0-10_2.12'
     }
 }
 mainClassName = 'com.zhujiejun.recomder.App003'

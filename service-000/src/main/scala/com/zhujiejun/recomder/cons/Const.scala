@@ -6,8 +6,8 @@ object Const {
     val SERVICE_000_NAME = "data-loader"
     val SERVICE_001_NAME = "statistics-recommender"
     val SERVICE_002_NAME = "offline-recommender"
-    val SERVICE_003_NAME = "streaming-recommender"
-    val SERVICE_004_NAME = "kafka-process-stream"
+    val SERVICE_003_NAME = "kafka-process-stream"
+    val SERVICE_004_NAME = "streaming-recommender"
     val SERVICE_005_NAME = "content-recommender"
 
     val DRIVER_PATH = "/home/cat/service-000/lib/service-000.jar"
