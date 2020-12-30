@@ -14,7 +14,7 @@ object App002 {
         val sparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_002_NAME)
         sparkConf
             .set("spark.driver.cores", "6")
-            .set("spark.driver.memory", "512m")
+            .set("spark.driver.memory", "1g")
             .set("spark.executor.cores", "6")
             .set("spark.executor.memory", "2g")
             .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
@@ -35,8 +35,8 @@ object App002 {
         //val (rank, iterations, lambda) = (200, 5, 0.1)
         val (rank, iterations, lambda) = (300, 5, 0.9074302725757746)
         val model = ALS.train(trainData, rank, iterations, lambda)
-        //基于用户和电影的隐特征，计算预测评分，得到用户的推荐列表
-        //计算user和movie的笛卡尔积，得到一个空评分矩阵
+        //基于用户和电影的隐特征,计算预测评分,得到用户的推荐列表
+        //计算user和movie的笛卡尔积,得到一个空评分矩阵
         val userMoviesRDD = userRDD.cartesian(movieRDD)
         //调用model的predict方法预测评分
         val preRatings = model.predict(userMoviesRDD)
@@ -61,11 +61,11 @@ object App002 {
             }
         }
 
-        //基于电影隐特征，计算相似度矩阵，得到电影的相似度列表
+        //基于电影隐特征,计算相似度矩阵,得到电影的相似度列表
         val movieFeaturesRDD = model.productFeatures.map {
             case (mid, features) => (mid, new DoubleMatrix(features))
         }
-        //对所有电影两两计算它们的相似度，先做笛卡尔积
+        //对所有电影两两计算它们的相似度,先做笛卡尔积
         val movieRecsDS = movieFeaturesRDD.cartesian(movieFeaturesRDD)
             .filter {
                 case (a, b) => a._1 != b._1 //把自己跟自己的配对过滤掉

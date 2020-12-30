@@ -15,7 +15,7 @@ object App003 {
         val sparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_005_NAME)
         sparkConf
             .set("spark.driver.cores", "6")
-            .set("spark.driver.memory", "512m")
+            .set("spark.driver.memory", "1g ")
             .set("spark.executor.cores", "6")
             .set("spark.executor.memory", "2g")
             .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
@@ -45,7 +45,7 @@ object App003 {
         val rescaledData = idfModel.transform(featurizedData)
         //rescaledData.show(truncate = false)
 
-        //基于电影内容，计算相似度矩阵，得到电影的相似度列表
+        //基于电影内容,计算相似度矩阵,得到电影的相似度列表
         val movieContentsRDD = rescaledData.map(row =>
             (row.getAs[Int]("mid"), row.getAs[SparseVector]("features").toArray)
         ).rdd.map { x =>
@@ -74,7 +74,7 @@ object App003 {
             movieRecs.recs.foreach { item =>
                 val mid = item.mid.toString
                 val score = item.score.toString
-                HBaseUtil.addRowData(OFFLINE_MOVIE_TABLE_NAME, rowKey, MOVIE_FEATURES_RECS_COLUMN_FAMILY, mid, score)
+                HBaseUtil.addRowData(OFFLINE_MOVIE_TABLE_NAME, rowKey, MOVIE_CONTENTS_RECS_COLUMN_FAMILY, mid, score)
             }
         }
 
