@@ -14,7 +14,7 @@ plugins {
 
 allprojects {
     repositories {
-        //jcenter()
+        jcenter()
         maven { url "https://maven.aliyun.com/repository/spring" }
         maven { url "https://maven.aliyun.com/repository/google" }
         maven { url "https://maven.aliyun.com/repository/public" }

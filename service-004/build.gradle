@@ -12,4 +12,4 @@ project(':service-004') {
         implementation 'org.apache.spark:spark-streaming-kafka-0-10_2.12'
     }
 }
-mainClassName = 'com.zhujiejun.recomder.App0034'
+mainClassName = 'com.zhujiejun.recomder.App004'
