@@ -3,6 +3,21 @@ package com.zhujiejun.recomder.cons
 import org.apache.kafka.common.serialization.StringDeserializer
 
 object Const {
+    val CONFIG = Map(
+        "spark.cores" -> "local[*]",
+        "kafka.from.topic" -> "sfb_recomder_log",
+        "kafka.to.topic" -> "sfb_recomder",
+        "kafka.brokers" -> "node101:9092",
+        "zookeepers" -> "node101:2181",
+    )
+
+    val KAFKA_PARAM = Map(
+        "group.id" -> "recommender",
+        "auto.offset.reset" -> "latest",
+        "bootstrap.servers" -> "node101:9092",
+        "key.deserializer" -> classOf[StringDeserializer],
+        "value.deserializer" -> classOf[StringDeserializer]
+    )
     val SERVICE_000_NAME = "data_loader"
     val SERVICE_001_NAME = "statistics_recommender"
     val SERVICE_002_NAME = "offline_recommender"
@@ -10,10 +25,6 @@ object Const {
     val SERVICE_004_NAME = "kafka_process_stream"
     val SERVICE_005_NAME = "streaming_recommender"
 
-    val DRIVER_PATH = "/home/cat/service_000/lib/service_000.jar"
-    val MOVIE_DATA_PATH = "/home/cat/Downloads/common/movies.csv"
-    val RATING_DATA_PATH = "/home/cat/Downloads/common/ratings.csv"
-    val TAG_DATA_PATH = "/home/cat/Downloads/common/tags.csv"
 
     val MAX_USER_RATINGS_NUM = 20
     val MAX_SIM_MOVIES_NUM = 20
@@ -21,22 +32,10 @@ object Const {
     val HBASE_ZOOKEEPER_QUORUM = "node101"
     val HBASE_ZOOKEEPER_PROPERTY_CLIENTPORT = "2181"
 
-    val CONFIG = Map(
-        "spark.cores" _ > "local[*]",
-        "kafka.from.topic" _ > "sfb_recomder_log",
-        "kafka.to.topic" _ > "sfb_recomder",
-        "kafka.brokers" _ > "node101:9092",
-        "zookeepers" _ > "node101:2181",
-    )
-
-    // 定义kafka连接参数
-    val KAFKA_PARAM = Map(
-        "group.id" _ > "recommender",
-        "auto.offset.reset" _ > "latest",
-        "bootstrap.servers" _ > "node101:9092",
-        "key.deserializer" _ > classOf[StringDeserializer],
-        "value.deserializer" _ > classOf[StringDeserializer]
-    )
+    val DRIVER_PATH = "/home/cat/service_000/lib/service_000.jar"
+    val MOVIE_DATA_PATH = "/home/cat/Downloads/common/movies.csv"
+    val RATING_DATA_PATH = "/home/cat/Downloads/common/ratings.csv"
+    val TAG_DATA_PATH = "/home/cat/Downloads/common/tags.csv"
 
     //000原始数据表的名称
     val ORIGINAL_MOVIE_TABLE_NAME = "sfb_original"

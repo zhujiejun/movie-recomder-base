@@ -2,7 +2,7 @@ package com.zhujiejun.recomder.util
 
 import com.google.common.collect.Lists
 import com.zhujiejun.recomder.cons.Const._
-import com.zhujiejun.recomder.data.{Movie, MovieRecs, Rating, Recommendation}
+import com.zhujiejun.recomder.data._
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.util.Bytes
