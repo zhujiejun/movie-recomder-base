@@ -2,8 +2,6 @@ package com.zhujiejun.recomder.cons
 
 import org.apache.kafka.common.serialization.StringDeserializer
 
-import java.text.SimpleDateFormat
-
 object Const {
     val CONFIG = Map(
         "spark.cores" -> "local[*]",
@@ -21,7 +19,7 @@ object Const {
         "value.deserializer" -> classOf[StringDeserializer]
     )
 
-    val FORMATTOR = new SimpleDateFormat("yyyyMM")
+    val YEAR_MONTH_PATTERN = "yyyyMM"
 
     val SERVICE_000_NAME = "data_loader"
     val SERVICE_001_NAME = "statistics_recommender"

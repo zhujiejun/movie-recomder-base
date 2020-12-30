@@ -10,8 +10,9 @@ import org.apache.hadoop.hbase.{Cell, CellUtil, HBaseConfiguration, TableName}
 import org.jblas.DoubleMatrix
 import org.slf4j.{Logger, LoggerFactory}
 
+import java.time.format.DateTimeFormatter
+import java.time.{Instant, LocalDateTime, ZoneId}
 import java.util
-import java.util.Date
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ListBuffer
 
@@ -251,16 +252,15 @@ object HBaseUtil {
         movie1.dot(movie2) / (movie1.norm2() * movie2.norm2())
     }
 
+    def toYearMonth(timestamp: Long): String = {
+        val instant = Instant.ofEpochMilli(timestamp)
+        val localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault)
+        localDateTime.format(DateTimeFormatter.ofPattern(YEAR_MONTH_PATTERN))
+    }
+
     def main(args: Array[String]): Unit = {
-        //System.out.println(HBaseUtil.isTableExist("sfb_base"))
-        /*HBaseUtil.getRatingsFromHbase(HBASE_MOVIE_TABLE_NAME, HBASE_RATING_COLUMN_FAMILY).foreach { movie =>
-            println(s"---------the current movie is ${movie.toString}---------")
-        }*/
-        //println("9.93346386E8".toDouble)
-        //val movieRecs = MovieRecs(10000, Array(Recommendation(10001, 0.9737d), Recommendation(10001, 0.9737d)))
-        //println(movieRecs.toString)
-        val x = Long.MaxValue
-        val r = FORMATTOR.format(new Date(x)).toInt
-        println(r)
+        //val yearmonth = calYearMonth(System.currentTimeMillis())
+        val yearmonth = toYearMonth(1609321726)
+        println(yearmonth)
     }
 }

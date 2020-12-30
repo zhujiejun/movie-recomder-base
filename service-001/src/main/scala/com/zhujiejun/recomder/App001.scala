@@ -3,12 +3,10 @@ package com.zhujiejun.recomder
 import com.zhujiejun.recomder.cons.Const._
 import com.zhujiejun.recomder.data._
 import com.zhujiejun.recomder.util.HBaseUtil
-import com.zhujiejun.recomder.util.HBaseUtil.checkTableExistInHabse
+import com.zhujiejun.recomder.util.HBaseUtil.{checkTableExistInHabse, toYearMonth}
 import org.apache.commons.lang3.RandomStringUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
-
-import java.util.Date
 
 object App001 {
     def main(args: Array[String]): Unit = {
@@ -46,9 +44,9 @@ object App001 {
 
         //2.近期热门统计,按照"yyyyMM"格式选取最近的评分数据,统计评分个数,mid,count,yearmonth
         //注册udf,把时间戳转换成年月格式
-        spark.udf.register("changeDate", (x: Int) => FORMATTOR.format(new Date(x * 1000L)).toInt)
+        spark.udf.register("toYearMonth", (x: Int) => toYearMonth(x * 1000L).toInt)
         //对原始数据做预处理,去掉uid
-        val ratingOfYearMonthDF = spark.sql("select mid, score, changeDate(timestamp) yearmonth from ratings_tmp")
+        val ratingOfYearMonthDF = spark.sql("select mid, score, toYearMonth(timestamp) yearmonth from ratings_tmp")
         ratingOfYearMonthDF.createOrReplaceTempView("rating_of_month")
         //从rating_of_month中查找电影在各个月份的评分,mid,count,yearmonth
         val rateMoreRecentlyMoviesDS = spark.sql("select mid, count(mid) count, yearmonth from rating_of_month " +
