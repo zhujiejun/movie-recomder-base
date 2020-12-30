@@ -57,11 +57,11 @@ object Const {
 
     //002|003离线表名称
     val OFFLINE_MOVIE_TABLE_NAME = "sfb_offline"
-    val USER_RECS_COLUMN_FAMILY = "user_recs"
-    val MOVIE_FEATURES_RECS_COLUMN_FAMILY = "movie_features_recs"
-    val MOVIE_CONTENTS_RECS_COLUMN_FAMILY = "movie_contents_recs"
+    val OFFLINE_USER_RECS_COLUMN_FAMILY = "offline_user_recs"
+    val MOVIE_FEATURES_RECS_COLUMN_FAMILY = "movie_features_matrix"
+    val MOVIE_CONTENTS_RECS_COLUMN_FAMILY = "movie_contents_matrix"
 
     //004|005实时表名称
     val STREAM_MOVIE_TABLE_NAME = "sfb_stream"
-    val STREAM_RECS_COLUMN_FAMILY = "stream_recs"
+    val STREAM_USER_RECS_COLUMN_FAMILY = "stream_user_recs"
 }

@@ -57,7 +57,7 @@ object App002 {
             userRecs.recs.foreach { item =>
                 val mid = item.mid.toString
                 val score = item.score.toString
-                HBaseUtil.addRowData(OFFLINE_MOVIE_TABLE_NAME, rowKey, USER_RECS_COLUMN_FAMILY, mid, score)
+                HBaseUtil.addRowData(OFFLINE_MOVIE_TABLE_NAME, rowKey, OFFLINE_USER_RECS_COLUMN_FAMILY, mid, score)
             }
         }
 

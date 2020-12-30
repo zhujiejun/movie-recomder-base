@@ -239,7 +239,7 @@ object HBaseUtil {
             case OFFLINE_MOVIE_TABLE_NAME =>
                 if (!HBaseUtil.isTableExist(OFFLINE_MOVIE_TABLE_NAME)) {
                     println(s"----------the table $OFFLINE_MOVIE_TABLE_NAME  not existed, create the table----------")
-                    HBaseUtil.createTable(OFFLINE_MOVIE_TABLE_NAME, USER_RECS_COLUMN_FAMILY, MOVIE_FEATURES_RECS_COLUMN_FAMILY)
+                    HBaseUtil.createTable(OFFLINE_MOVIE_TABLE_NAME, OFFLINE_USER_RECS_COLUMN_FAMILY, MOVIE_FEATURES_RECS_COLUMN_FAMILY)
                 }
             case _ => println
         }

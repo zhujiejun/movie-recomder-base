@@ -130,7 +130,7 @@ object App005 {
                     //4.把推荐数据保存到HBase
                     streamRecs.foreach {
                         case (mid, avgScore) =>
-                            HBaseUtil.addRowData(STREAM_MOVIE_TABLE_NAME, uid.toString, STREAM_RECS_COLUMN_FAMILY, mid.toString, avgScore.toString)
+                            HBaseUtil.addRowData(STREAM_MOVIE_TABLE_NAME, uid.toString, STREAM_USER_RECS_COLUMN_FAMILY, mid.toString, avgScore.toString)
                     }
             }
         }
