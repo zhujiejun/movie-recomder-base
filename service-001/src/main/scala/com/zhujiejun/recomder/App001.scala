@@ -8,9 +8,6 @@ import org.apache.commons.lang3.RandomStringUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 
-import java.text.SimpleDateFormat
-import java.util.Date
-
 object App001 {
     def main(args: Array[String]): Unit = {
         val sparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_001_NAME)
@@ -45,15 +42,13 @@ object App001 {
             HBaseUtil.addRowData(STATIC_MOVIE_TABLE_NAME, rowKey, RATE_MORE_MOVIES_COLUMN_FAMILY, "count", count)
         }
 
-        //2.近期热门统计,按照"yyyyMM"格式选取最近的评分数据,统计评分个数
-        //创建一个日期格式化工具
-        val simpleDateFormat = new SimpleDateFormat("yyyyMM")
+        //2.近期热门统计,按照"yyyyMM"格式选取最近的评分数据,统计评分个数,mid,count,yearmonth
         //注册udf,把时间戳转换成年月格式
         spark.udf.register("changeDate", (x: Int) => simpleDateFormat.format(new Date(x * 1000L)).toInt)
         //对原始数据做预处理,去掉uid
         val ratingOfYearMonthDF = spark.sql("select mid, score, changeDate(timestamp) yearmonth from ratings_tmp")
         ratingOfYearMonthDF.createOrReplaceTempView("rating_of_Month")
-        //从ratingOfMonth中查找电影在各个月份的评分,mid,count,yearmonth
+        //从rating_of_Month中查找电影在各个月份的评分,mid,count,yearmonth
         val rateMoreRecentlyMoviesDS = spark.sql("select mid, count(mid) count, yearmonth from rating_of_Month " +
             "group by yearmonth, mid order by yearmonth desc, count desc").as[RateMoreRecentlyMovie]
         rateMoreRecentlyMoviesDS.foreach { item =>
@@ -81,7 +76,7 @@ object App001 {
         val genres = List("Action", "Adventure", "Animation", "Comedy", "Crime", "Documentary",
             "Drama", "Family", "Fantasy", "Foreign", "History", "Horror", "Music", "Mystery",
             "Romance", "Science", "Tv", "Thriller", "War", "Western")
-        //把平均评分加入movie表里,加一列,inner join
+        //把平均评分加入movie表里,加一列,inner join,mid,name,descri,timelong,issue,shoot,language,genres,actors,directors,avg
         val movieWithScoreDF = movieDF.join(averageMoviesDS.toDF(), "mid")
         //为做笛卡尔积,把genres转成rdd
         val genresRDD = spark.sparkContext.makeRDD(genres)
