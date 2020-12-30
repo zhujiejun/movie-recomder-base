@@ -11,6 +11,7 @@ import org.jblas.DoubleMatrix
 import org.slf4j.{Logger, LoggerFactory}
 
 import java.util
+import java.util.Date
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ListBuffer
 
@@ -256,7 +257,10 @@ object HBaseUtil {
             println(s"---------the current movie is ${movie.toString}---------")
         }*/
         //println("9.93346386E8".toDouble)
-        val movieRecs = MovieRecs(10000, Array(Recommendation(10001, 0.9737d), Recommendation(10001, 0.9737d)))
-        println(movieRecs.toString)
+        //val movieRecs = MovieRecs(10000, Array(Recommendation(10001, 0.9737d), Recommendation(10001, 0.9737d)))
+        //println(movieRecs.toString)
+        val x = Long.MaxValue
+        val r = FORMATTOR.format(new Date(x)).toInt
+        println(r)
     }
 }
