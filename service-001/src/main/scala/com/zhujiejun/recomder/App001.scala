@@ -46,7 +46,7 @@ object App001 {
 
         //2.近期热门统计,按照"yyyyMM"格式选取最近的评分数据,统计评分个数,mid,count,yearmonth
         //注册udf,把时间戳转换成年月格式
-        spark.udf.register("changeDate", (x: Int) => FORMATTOR.format(new Date(x * 1000L)).toInt)
+        spark.udf.register("changeDate", (x: Int) => FORMATTOR.format(new Date(x * 1000L)).toLong)
         //对原始数据做预处理,去掉uid
         val ratingOfYearMonthDF = spark.sql("select mid, score, changeDate(timestamp) yearmonth from ratings_tmp")
         ratingOfYearMonthDF.createOrReplaceTempView("rating_of_Month")
