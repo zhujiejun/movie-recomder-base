@@ -68,7 +68,6 @@ object App002 {
             }
         }
 
-
         //基于电影隐特征，计算相似度矩阵，得到电影的相似度列表
         val movieFeaturesRDD = model.productFeatures.map {
             case (mid, features) => (mid, new DoubleMatrix(features))

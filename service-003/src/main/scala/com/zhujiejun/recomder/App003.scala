@@ -1,6 +1,6 @@
 package com.zhujiejun.recomder
 
-import com.zhujiejun.recomder.cons.Const.CONFIG
+import com.zhujiejun.recomder.cons.Const.{CONFIG, SERVICE_003_NAME}
 import com.zhujiejun.recomder.util.LogProcessorSupplier
 import org.apache.kafka.streams.{KafkaStreams, StreamsConfig, Topology}
 
@@ -10,7 +10,7 @@ object App003 {
     def main(args: Array[String]): Unit = {
         //定义kafka streaming的配置
         val settings = new Properties()
-        settings.put(StreamsConfig.APPLICATION_ID_CONFIG, CONFIG("application.id.config"))
+        settings.put(StreamsConfig.APPLICATION_ID_CONFIG, SERVICE_003_NAME)
         settings.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, CONFIG("kafka.brokers"))
         //settings.put(StreamsConfig.ZOOKEEPER_CONNECT_CONFIG, CONFIG("zookeepers"))
 

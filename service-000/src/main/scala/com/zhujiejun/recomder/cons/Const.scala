@@ -27,7 +27,6 @@ object Const {
         "kafka.to.topic" -> "sfb_recomder",
         "kafka.brokers" -> "node101:9092",
         "zookeepers" -> "node101:2181",
-        "application.id.config" -> "logFilter"
     )
 
     // 定义kafka连接参数
