@@ -29,6 +29,8 @@ object Const {
     val SERVICE_005_NAME = "streaming_recommender"
 
 
+    val REDIS_PORT = "7001"
+    val REDIS_HOST = "node101"
     val MAX_USER_RATINGS_NUM = 20
     val MAX_SIM_MOVIES_NUM = 20
     val USER_MAX_RECOMMENDATION = 20
