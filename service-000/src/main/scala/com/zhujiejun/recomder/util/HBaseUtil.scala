@@ -7,6 +7,7 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.util.Bytes
 import org.apache.hadoop.hbase.{Cell, CellUtil, HBaseConfiguration, TableName}
+import org.jblas.DoubleMatrix
 import org.slf4j.{Logger, LoggerFactory}
 
 import java.util
@@ -242,6 +243,11 @@ object HBaseUtil {
                 }
             case _ => println
         }
+    }
+
+    //求向量余弦相似度
+    def consinSim(movie1: DoubleMatrix, movie2: DoubleMatrix): Double = {
+        movie1.dot(movie2) / (movie1.norm2() * movie2.norm2())
     }
 
     def main(args: Array[String]): Unit = {

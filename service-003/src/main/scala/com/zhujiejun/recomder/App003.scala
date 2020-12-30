@@ -3,6 +3,7 @@ package com.zhujiejun.recomder
 import com.zhujiejun.recomder.cons.Const._
 import com.zhujiejun.recomder.data._
 import com.zhujiejun.recomder.util.HBaseUtil
+import com.zhujiejun.recomder.util.HBaseUtil.{checkTableExistInHabse, consinSim}
 import org.apache.spark.SparkConf
 import org.apache.spark.ml.feature.{HashingTF, IDF, Tokenizer}
 import org.apache.spark.ml.linalg.SparseVector
@@ -10,11 +11,6 @@ import org.apache.spark.sql.SparkSession
 import org.jblas.DoubleMatrix
 
 object App003 {
-    //求向量余弦相似度
-    def consinSim(movie1: DoubleMatrix, movie2: DoubleMatrix): Double = {
-        movie1.dot(movie2) / (movie1.norm2() * movie2.norm2())
-    }
-
     def main(args: Array[String]): Unit = {
         val sparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_005_NAME)
         sparkConf
@@ -29,6 +25,7 @@ object App003 {
         val spark = SparkSession.builder().config(sparkConf).getOrCreate()
 
         import spark.implicits._
+        checkTableExistInHabse(OFFLINE_MOVIE_TABLE_NAME)
         val movies: List[Movie] = HBaseUtil.getMoviesFromHbase(ORIGINAL_MOVIE_TABLE_NAME, ORIGINAL_MOVIE_COLUMN_FAMILY)
         val movieTagsDF = spark.sparkContext.parallelize(movies).map { m =>
             //提取mid,name,genres三项作为原始内容特征,分词器默认按照空格做分词

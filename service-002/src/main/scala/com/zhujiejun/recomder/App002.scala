@@ -3,18 +3,13 @@ package com.zhujiejun.recomder
 import com.zhujiejun.recomder.cons.Const._
 import com.zhujiejun.recomder.data._
 import com.zhujiejun.recomder.util.HBaseUtil
-import com.zhujiejun.recomder.util.HBaseUtil.checkTableExistInHabse
+import com.zhujiejun.recomder.util.HBaseUtil.{checkTableExistInHabse, consinSim}
 import org.apache.spark.SparkConf
 import org.apache.spark.mllib.recommendation.{ALS, Rating => MLRating}
 import org.apache.spark.sql.SparkSession
 import org.jblas.DoubleMatrix
 
 object App002 {
-    //求向量余弦相似度
-    def consinSim(movie1: DoubleMatrix, movie2: DoubleMatrix): Double = {
-        movie1.dot(movie2) / (movie1.norm2() * movie2.norm2())
-    }
-
     def main(args: Array[String]): Unit = {
         val sparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_002_NAME)
         sparkConf
