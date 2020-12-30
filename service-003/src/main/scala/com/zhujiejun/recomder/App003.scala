@@ -111,7 +111,7 @@ object App003 {
         val simMovieMatrixBroadCast = sparkContext.broadcast(simMovieMatrix)
         //通过kafka创建一个DStream
         val kafkaStream = KafkaUtils.createDirectStream[String, String](streamingContext, LocationStrategies.PreferConsistent,
-            ConsumerStrategies.Subscribe[String, String](Array(CONFIG("kafka.topic")), KAFKA_PARAM))
+            ConsumerStrategies.Subscribe[String, String](Array(CONFIG("kafka.to.topic")), KAFKA_PARAM))
         //把原始数据UID|MID|SCORE|TIMESTAMP转换成评分流
         val ratingStream = kafkaStream.map { msg =>
             val attr = msg.value().split("\\|")

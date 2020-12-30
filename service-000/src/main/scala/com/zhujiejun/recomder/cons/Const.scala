@@ -23,7 +23,11 @@ object Const {
 
     val CONFIG = Map(
         "spark.cores" -> "local[*]",
-        "kafka.topic" -> "sfb_recomder"
+        "kafka.from.topic" -> "sfb_recomder_log",
+        "kafka.to.topic" -> "sfb_recomder",
+        "kafka.brokers" -> "node101:9092",
+        "zookeepers" -> "node101:2181",
+        "application.id.config" -> "logFilter"
     )
 
     // 定义kafka连接参数
