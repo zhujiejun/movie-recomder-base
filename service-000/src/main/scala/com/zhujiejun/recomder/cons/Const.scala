@@ -50,13 +50,13 @@ object Const {
     val AVERAGE_MOVIES_COLUMN_FAMILY = "average_movies"
     val GENRES_TOP_MOVIES_COLUMN_FAMILY = "genres_top_movies"
 
-    //002离线表名称
+    //002|003离线表名称
     val OFFLINE_MOVIE_TABLE_NAME = "sfb_offline"
     val USER_RECS_COLUMN_FAMILY = "user_recs"
     val MOVIE_FEATURES_RECS_COLUMN_FAMILY = "movie_features_recs"
     val MOVIE_CONTENTS_RECS_COLUMN_FAMILY = "movie_contents_recs"
 
-    //003实时表名称
+    //004|005实时表名称
     val STREAM_MOVIE_TABLE_NAME = "sfb_stream"
     val STREAM_RECS_COLUMN_FAMILY = "stream_recs"
 }
