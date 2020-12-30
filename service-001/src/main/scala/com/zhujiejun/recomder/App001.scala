@@ -27,10 +27,10 @@ object App001 {
 
         import spark.implicits._
         checkTableExistInHabse(STATIC_MOVIE_TABLE_NAME)
-        val movies: List[Movie] = HBaseUtil.getMoviesFromHbase(HBASE_MOVIE_TABLE_NAME, HBASE_MOVIE_COLUMN_FAMILY)
+        val movies: List[Movie] = HBaseUtil.getMoviesFromHbase(ORIGINAL_MOVIE_TABLE_NAME, ORIGINAL_MOVIE_COLUMN_FAMILY)
         val movieDF = spark.sparkContext.parallelize(movies).toDF()
 
-        val ratings: List[Rating] = HBaseUtil.getRatingsFromHbase(HBASE_MOVIE_TABLE_NAME, HBASE_RATING_COLUMN_FAMILY)
+        val ratings: List[Rating] = HBaseUtil.getRatingsFromHbase(ORIGINAL_MOVIE_TABLE_NAME, ORIGINAL_RATING_COLUMN_FAMILY)
         val ratingDF = spark.sparkContext.parallelize(ratings).toDF()
 
         //创建名为ratings_tmp的临时表

@@ -29,7 +29,7 @@ object App005 {
         val spark = SparkSession.builder().config(sparkConf).getOrCreate()
 
         import spark.implicits._
-        val movies: List[Movie] = HBaseUtil.getMoviesFromHbase(HBASE_MOVIE_TABLE_NAME, HBASE_MOVIE_COLUMN_FAMILY)
+        val movies: List[Movie] = HBaseUtil.getMoviesFromHbase(ORIGINAL_MOVIE_TABLE_NAME, ORIGINAL_MOVIE_COLUMN_FAMILY)
         val movieTagsDF = spark.sparkContext.parallelize(movies).map { m =>
             //提取mid,name,genres三项作为原始内容特征,分词器默认按照空格做分词
             (m.mid, m.name, m.genres.map(c => if (c == '|') ' ' else c))
@@ -51,14 +51,14 @@ object App005 {
         //rescaledData.show(truncate = false)
 
         //基于电影内容，计算相似度矩阵，得到电影的相似度列表
-        val movieFeaturesRDD = rescaledData.map(row =>
+        val movieContentsRDD = rescaledData.map(row =>
             (row.getAs[Int]("mid"), row.getAs[SparseVector]("features").toArray)
         ).rdd.map { x =>
             (x._1, new DoubleMatrix(x._2))
         }
         //movieFeatures.collect().foreach(println)
         //对所有电影两两计算它们的相似度,先做笛卡尔积
-        val movieRecsDS = movieFeaturesRDD.cartesian(movieFeaturesRDD)
+        val movieRecsDS = movieContentsRDD.cartesian(movieContentsRDD)
             .filter {
                 case (a, b) => a._1 != b._1 //把自己跟自己的配对过滤掉
             }
@@ -79,7 +79,7 @@ object App005 {
             movieRecs.recs.foreach { item =>
                 val mid = item.mid.toString
                 val score = item.score.toString
-                HBaseUtil.addRowData(OFFLINE_MOVIE_TABLE_NAME, rowKey, MOVIE_RECS_COLUMN_FAMILY, mid, score)
+                HBaseUtil.addRowData(OFFLINE_MOVIE_TABLE_NAME, rowKey, MOVIE_FEATURES_RECS_COLUMN_FAMILY, mid, score)
             }
         }
 

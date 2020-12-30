@@ -26,7 +26,7 @@ object App004 {
         //1.从相似度矩阵中拿到所有相似的电影
         val allSimMovies = simMovies(mid).toArray
         //2.从HBase中查询用户已看过的电影
-        val ratings: List[Rating] = HBaseUtil.getRatingsFromHbase(HBASE_MOVIE_TABLE_NAME, HBASE_RATING_COLUMN_FAMILY)
+        val ratings: List[Rating] = HBaseUtil.getRatingsFromHbase(ORIGINAL_MOVIE_TABLE_NAME, ORIGINAL_RATING_COLUMN_FAMILY)
         val ratingExist = ratings.filter { r =>
             r.uid == uid
         }.toArray
@@ -103,7 +103,7 @@ object App004 {
         val sparkContext = spark.sparkContext
         val streamingContext = new StreamingContext(sparkContext, Seconds(2))
 
-        val movieRecses: List[MovieRecs] = HBaseUtil.getMovieRecsFromHbase(OFFLINE_MOVIE_TABLE_NAME, MOVIE_RECS_COLUMN_FAMILY)
+        val movieRecses: List[MovieRecs] = HBaseUtil.getMovieRecsFromHbase(OFFLINE_MOVIE_TABLE_NAME, MOVIE_FEATURES_RECS_COLUMN_FAMILY)
         val simMovieMatrix = spark.sparkContext.parallelize(movieRecses).map { movieRecs => //为了查询相似度方便,转换成map
             (movieRecs.mid, movieRecs.recs.map(x => (x.mid, x.score)).toMap)
         }.collectAsMap()

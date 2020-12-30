@@ -23,7 +23,7 @@ object App000 {
         val spark = SparkSession.builder().config(sparkConf).getOrCreate()
 
         import spark.implicits._
-        checkTableExistInHabse(HBASE_MOVIE_TABLE_NAME)
+        checkTableExistInHabse(ORIGINAL_MOVIE_TABLE_NAME)
         val movie = spark.sparkContext.textFile(MOVIE_DATA_PATH)
         movie.map(item => {
             val attr = item.split("\\^")
@@ -31,16 +31,16 @@ object App000 {
                 attr(5).trim, attr(6).trim, attr(7).trim, attr(8).trim, attr(9).trim)
         }).toDS().foreach { item =>
             val rowKey = RandomStringUtils.randomAlphanumeric(18)
-            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_MOVIE_COLUMN_FAMILY, "mid", item.mid.toString)
-            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_MOVIE_COLUMN_FAMILY, "name", item.name)
-            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_MOVIE_COLUMN_FAMILY, "descri", item.descri)
-            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_MOVIE_COLUMN_FAMILY, "timelong", item.timelong)
-            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_MOVIE_COLUMN_FAMILY, "issue", item.issue)
-            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_MOVIE_COLUMN_FAMILY, "shoot", item.shoot)
-            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_MOVIE_COLUMN_FAMILY, "language", item.language)
-            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_MOVIE_COLUMN_FAMILY, "genres", item.genres)
-            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_MOVIE_COLUMN_FAMILY, "actors", item.actors)
-            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_MOVIE_COLUMN_FAMILY, "directors", item.directors)
+            HBaseUtil.addRowData(ORIGINAL_MOVIE_TABLE_NAME, rowKey, ORIGINAL_MOVIE_COLUMN_FAMILY, "mid", item.mid.toString)
+            HBaseUtil.addRowData(ORIGINAL_MOVIE_TABLE_NAME, rowKey, ORIGINAL_MOVIE_COLUMN_FAMILY, "name", item.name)
+            HBaseUtil.addRowData(ORIGINAL_MOVIE_TABLE_NAME, rowKey, ORIGINAL_MOVIE_COLUMN_FAMILY, "descri", item.descri)
+            HBaseUtil.addRowData(ORIGINAL_MOVIE_TABLE_NAME, rowKey, ORIGINAL_MOVIE_COLUMN_FAMILY, "timelong", item.timelong)
+            HBaseUtil.addRowData(ORIGINAL_MOVIE_TABLE_NAME, rowKey, ORIGINAL_MOVIE_COLUMN_FAMILY, "issue", item.issue)
+            HBaseUtil.addRowData(ORIGINAL_MOVIE_TABLE_NAME, rowKey, ORIGINAL_MOVIE_COLUMN_FAMILY, "shoot", item.shoot)
+            HBaseUtil.addRowData(ORIGINAL_MOVIE_TABLE_NAME, rowKey, ORIGINAL_MOVIE_COLUMN_FAMILY, "language", item.language)
+            HBaseUtil.addRowData(ORIGINAL_MOVIE_TABLE_NAME, rowKey, ORIGINAL_MOVIE_COLUMN_FAMILY, "genres", item.genres)
+            HBaseUtil.addRowData(ORIGINAL_MOVIE_TABLE_NAME, rowKey, ORIGINAL_MOVIE_COLUMN_FAMILY, "actors", item.actors)
+            HBaseUtil.addRowData(ORIGINAL_MOVIE_TABLE_NAME, rowKey, ORIGINAL_MOVIE_COLUMN_FAMILY, "directors", item.directors)
         }
 
         val rating = spark.sparkContext.textFile(RATING_DATA_PATH)
@@ -49,10 +49,10 @@ object App000 {
             Rating(attr(0).toInt, attr(1).toInt, attr(2).toDouble, attr(3).toInt)
         }).toDS().foreach { item =>
             val rowKey = RandomStringUtils.randomAlphanumeric(18)
-            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_RATING_COLUMN_FAMILY, "uid", item.uid.toString)
-            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_RATING_COLUMN_FAMILY, "mid", item.mid.toString)
-            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_RATING_COLUMN_FAMILY, "score", item.score.toString)
-            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_RATING_COLUMN_FAMILY, "timestamp", item.timestamp.toString)
+            HBaseUtil.addRowData(ORIGINAL_MOVIE_TABLE_NAME, rowKey, ORIGINAL_RATING_COLUMN_FAMILY, "uid", item.uid.toString)
+            HBaseUtil.addRowData(ORIGINAL_MOVIE_TABLE_NAME, rowKey, ORIGINAL_RATING_COLUMN_FAMILY, "mid", item.mid.toString)
+            HBaseUtil.addRowData(ORIGINAL_MOVIE_TABLE_NAME, rowKey, ORIGINAL_RATING_COLUMN_FAMILY, "score", item.score.toString)
+            HBaseUtil.addRowData(ORIGINAL_MOVIE_TABLE_NAME, rowKey, ORIGINAL_RATING_COLUMN_FAMILY, "timestamp", item.timestamp.toString)
         }
 
         val tag = spark.sparkContext.textFile(TAG_DATA_PATH)
@@ -61,10 +61,10 @@ object App000 {
             Tag(attr(0).toInt, attr(1).toInt, attr(2).trim, attr(3).toInt)
         }).toDS().foreach { item =>
             val rowKey = RandomStringUtils.randomAlphanumeric(18)
-            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_TAG_COLUMN_FAMILY, "tag", item.tag)
-            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_TAG_COLUMN_FAMILY, "uid", item.uid.toString)
-            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_TAG_COLUMN_FAMILY, "mid", item.mid.toString)
-            HBaseUtil.addRowData(HBASE_MOVIE_TABLE_NAME, rowKey, HBASE_TAG_COLUMN_FAMILY, "timestamp", item.timestamp.toString)
+            HBaseUtil.addRowData(ORIGINAL_MOVIE_TABLE_NAME, rowKey, ORIGINAL_TAG_COLUMN_FAMILY, "tag", item.tag)
+            HBaseUtil.addRowData(ORIGINAL_MOVIE_TABLE_NAME, rowKey, ORIGINAL_TAG_COLUMN_FAMILY, "uid", item.uid.toString)
+            HBaseUtil.addRowData(ORIGINAL_MOVIE_TABLE_NAME, rowKey, ORIGINAL_TAG_COLUMN_FAMILY, "mid", item.mid.toString)
+            HBaseUtil.addRowData(ORIGINAL_MOVIE_TABLE_NAME, rowKey, ORIGINAL_TAG_COLUMN_FAMILY, "timestamp", item.timestamp.toString)
         }
 
         spark.stop()

@@ -1,8 +1,8 @@
 package com.zhujiejun.recomder.util
 
 import breeze.numerics.sqrt
-import com.zhujiejun.recomder.cons.Const.{CONFIG, HBASE_MOVIE_TABLE_NAME, HBASE_RATING_COLUMN_FAMILY, SERVICE_001_NAME}
-import com.zhujiejun.recomder.data.{MovieSearch, Rating, RatingSearch, TagSearch}
+import com.zhujiejun.recomder.cons.Const._
+import com.zhujiejun.recomder.data._
 import org.apache.spark.SparkConf
 import org.apache.spark.mllib.recommendation.{ALS, MatrixFactorizationModel, Rating => MLRating}
 import org.apache.spark.rdd.RDD
@@ -51,7 +51,7 @@ object ALSTrainer {
             .registerKryoClasses(Array(classOf[MovieSearch], classOf[RatingSearch], classOf[TagSearch]))
 
         val spark = SparkSession.builder().config(sparkConf).getOrCreate()
-        val ratings: List[Rating] = HBaseUtil.getRatingsFromHbase(HBASE_MOVIE_TABLE_NAME, HBASE_RATING_COLUMN_FAMILY)
+        val ratings: List[Rating] = HBaseUtil.getRatingsFromHbase(ORIGINAL_MOVIE_TABLE_NAME, ORIGINAL_RATING_COLUMN_FAMILY)
         val ratingRDD = spark.sparkContext.parallelize(ratings).map { rating =>
             MLRating(rating.uid, rating.mid, rating.score) //转化成rdd,并且去掉时间戳
         }.cache()

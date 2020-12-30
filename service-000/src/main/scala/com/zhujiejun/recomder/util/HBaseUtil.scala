@@ -222,11 +222,11 @@ object HBaseUtil {
 
     def checkTableExistInHabse(tableName: String): Unit = {
         tableName match {
-            case HBASE_MOVIE_TABLE_NAME =>
-                if (!HBaseUtil.isTableExist(HBASE_MOVIE_TABLE_NAME)) {
-                    println(s"----------the table $HBASE_MOVIE_TABLE_NAME  not existed, create the table----------")
-                    HBaseUtil.createTable(HBASE_MOVIE_TABLE_NAME, HBASE_MOVIE_COLUMN_FAMILY,
-                        HBASE_RATING_COLUMN_FAMILY, HBASE_TAG_COLUMN_FAMILY)
+            case ORIGINAL_MOVIE_TABLE_NAME =>
+                if (!HBaseUtil.isTableExist(ORIGINAL_MOVIE_TABLE_NAME)) {
+                    println(s"----------the table $ORIGINAL_MOVIE_TABLE_NAME  not existed, create the table----------")
+                    HBaseUtil.createTable(ORIGINAL_MOVIE_TABLE_NAME, ORIGINAL_MOVIE_COLUMN_FAMILY,
+                        ORIGINAL_RATING_COLUMN_FAMILY, ORIGINAL_TAG_COLUMN_FAMILY)
                 }
             case STATIC_MOVIE_TABLE_NAME =>
                 if (!HBaseUtil.isTableExist(STATIC_MOVIE_TABLE_NAME)) {
@@ -238,7 +238,7 @@ object HBaseUtil {
             case OFFLINE_MOVIE_TABLE_NAME =>
                 if (!HBaseUtil.isTableExist(OFFLINE_MOVIE_TABLE_NAME)) {
                     println(s"----------the table $OFFLINE_MOVIE_TABLE_NAME  not existed, create the table----------")
-                    HBaseUtil.createTable(OFFLINE_MOVIE_TABLE_NAME, USER_RECS_COLUMN_FAMILY, MOVIE_RECS_COLUMN_FAMILY)
+                    HBaseUtil.createTable(OFFLINE_MOVIE_TABLE_NAME, USER_RECS_COLUMN_FAMILY, MOVIE_FEATURES_RECS_COLUMN_FAMILY)
                 }
             case _ => println
         }

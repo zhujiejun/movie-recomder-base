@@ -30,7 +30,7 @@ object App002 {
 
         import spark.implicits._
         checkTableExistInHabse(OFFLINE_MOVIE_TABLE_NAME)
-        val ratings: List[Rating] = HBaseUtil.getRatingsFromHbase(HBASE_MOVIE_TABLE_NAME, HBASE_RATING_COLUMN_FAMILY)
+        val ratings: List[Rating] = HBaseUtil.getRatingsFromHbase(ORIGINAL_MOVIE_TABLE_NAME, ORIGINAL_RATING_COLUMN_FAMILY)
         val ratingRDD = spark.sparkContext.parallelize(ratings).map { rating =>
             (rating.uid, rating.mid, rating.score) //转化成rdd,并且去掉时间戳
         }.cache()
@@ -94,7 +94,7 @@ object App002 {
             movieRecs.recs.foreach { item =>
                 val mid = item.mid.toString
                 val score = item.score.toString
-                HBaseUtil.addRowData(OFFLINE_MOVIE_TABLE_NAME, rowKey, MOVIE_RECS_COLUMN_FAMILY, mid, score)
+                HBaseUtil.addRowData(OFFLINE_MOVIE_TABLE_NAME, rowKey, MOVIE_FEATURES_RECS_COLUMN_FAMILY, mid, score)
             }
         }
 

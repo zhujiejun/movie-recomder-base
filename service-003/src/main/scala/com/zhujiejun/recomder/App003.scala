@@ -1,6 +1,6 @@
 package com.zhujiejun.recomder
 
-import com.zhujiejun.recomder.cons.Const.{CONFIG, SERVICE_003_NAME}
+import com.zhujiejun.recomder.cons.Const._
 import com.zhujiejun.recomder.util.LogProcessorSupplier
 import org.apache.kafka.streams.{KafkaStreams, StreamsConfig, Topology}
 
