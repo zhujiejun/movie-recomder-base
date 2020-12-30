@@ -37,7 +37,6 @@ object App001 {
         //不同的统计推荐结果
         //1.历史热门统计,历史评分数据最多,mid,count
         val rateMoreMoviesDS = spark.sql("select mid, count(mid) count from ratings_tmp group by mid").as[RateMoreMovie]
-        //把结果写入对应的HBase表中
         rateMoreMoviesDS.foreach { item =>
             val rowKey = RandomStringUtils.randomAlphanumeric(18)
             val mid = item.mid.toString
@@ -57,7 +56,6 @@ object App001 {
         //从ratingOfMonth中查找电影在各个月份的评分,mid,count,yearmonth
         val rateMoreRecentlyMoviesDS = spark.sql("select mid, count(mid) count, yearmonth from rating_of_Month " +
             "group by yearmonth, mid order by yearmonth desc, count desc").as[RateMoreRecentlyMovie]
-        //把结果写入对应的HBase表中
         rateMoreRecentlyMoviesDS.foreach { item =>
             val rowKey = RandomStringUtils.randomAlphanumeric(18)
             val mid = item.mid.toString
@@ -70,7 +68,6 @@ object App001 {
 
         //3.优质电影统计,统计电影的平均评分,mid,avg
         val averageMoviesDS = spark.sql("select mid, avg(score) avg from ratings_tmp group by mid").as[AverageMovie]
-        //把结果写入对应的HBase表中
         averageMoviesDS.foreach { item =>
             val rowKey = RandomStringUtils.randomAlphanumeric(18)
             val mid = item.mid.toString
@@ -102,7 +99,6 @@ object App001 {
                 case (genre, items) => GenresRecommendation(genre, items.toList.sortWith(_._2 > _._2).take(10)
                     .map(item => Recommendation(item._1, item._2)))
             }.toDS()
-        //把结果写入对应的HBase表中
         genresTopMoviesDS.foreach { item =>
             val rowKey = item.genres
             item.recs.foreach { recomder =>
