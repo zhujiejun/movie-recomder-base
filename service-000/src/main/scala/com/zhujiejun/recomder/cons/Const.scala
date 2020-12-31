@@ -8,7 +8,7 @@ object Const {
         "kafka.from.topic" -> "sfb_recomder_log",
         "kafka.to.topic" -> "sfb_recomder",
         "kafka.brokers" -> "node101:9092",
-        "zookeepers" -> "node101:2181",
+        "zookeepers" -> "node101:2181"
     )
 
     val KAFKA_PARAM = Map(
@@ -18,6 +18,14 @@ object Const {
         "key.deserializer" -> classOf[StringDeserializer],
         "value.deserializer" -> classOf[StringDeserializer]
     )
+
+    val ELASTICS_PARAM: Array[(String, String)] = Map(
+        "es.port" -> "9200",
+        "es.nodes.wan.only" -> "true",
+        "es.index.auto.create" -> "true",
+        //"es.mapping.id" -> "zip_record_id",
+        "es.nodes" -> "node101,node102,node103"
+    ).toArray
 
     val YEAR_MONTH_PATTERN = "yyyyMM"
 
