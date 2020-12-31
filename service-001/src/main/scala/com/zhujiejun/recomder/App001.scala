@@ -10,8 +10,8 @@ import org.elasticsearch.spark.sql.EsSparkSQL
 
 object App001 {
     def main(args: Array[String]): Unit = {
-        val sparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_001_NAME)
-        sparkConf
+        val sparkConfig :SparkConf= new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_001_NAME)
+        sparkConfig
             .setAll(ELASTICS_PARAM)
             .set("spark.driver.cores", "6")
             .set("spark.driver.memory", "512m")
@@ -19,15 +19,18 @@ object App001 {
             .set("spark.executor.memory", "2g")
             .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
             .registerKryoClasses(Array(classOf[MovieSearch], classOf[RatingSearch], classOf[TagSearch]))
-        val spark = SparkSession.builder().config(sparkConf).getOrCreate()
+        val spark = SparkSession.builder().config(sparkConfig).getOrCreate()
 
+        import spark.implicits._
         implicit val movieEncoder: Encoder[Movie] = Encoders.bean(classOf[Movie])
         val movieDF = EsSparkSQL.esDF(spark, ORIGINAL_MOVIE_COLUMN_FAMILY).orderBy("mid")
             .as[Movie].toDF()
+        movieDF.show()
 
         implicit val ratingEncoder: Encoder[Rating] = Encoders.bean(classOf[Rating])
         val ratingDF = EsSparkSQL.esDF(spark, ORIGINAL_RATING_COLUMN_FAMILY).orderBy("uid", "mid")
             .as[Rating].toDF()
+        ratingDF.show()
 
         //创建名为ratings_tmp的临时表
         ratingDF.createOrReplaceTempView("ratings_tmp")
@@ -37,6 +40,7 @@ object App001 {
         implicit val encoder1: Encoder[RateMoreMovie] = Encoders.bean(classOf[RateMoreMovie])
         val rateMoreMoviesRDD = spark.sql("select mid, count(mid) count from ratings_tmp group by mid")
             .as[RateMoreMovie].rdd
+        rateMoreMoviesRDD.toDF().show()
         rateMoreMoviesRDD.saveToEs(RATE_MORE_MOVIES_COLUMN_FAMILY)
 
         //2.近期热门统计,按照"yyyyMM"格式选取最近的评分数据,统计评分个数,mid,count,yearmonth
@@ -62,7 +66,6 @@ object App001 {
         val genres = List("Action", "Adventure", "Animation", "Comedy", "Crime", "Documentary",
             "Drama", "Family", "Fantasy", "Foreign", "History", "Horror", "Music", "Mystery",
             "Romance", "Science", "Tv", "Thriller", "War", "Western")
-        import spark.implicits._
         //把平均评分加入movie表里,加一列,inner join,mid,name,descri,timelong,issue,shoot,language,genres,actors,directors,avg
         val movieWithScoreDF = movieDF.join(averageMoviesRDD.toDF(), "mid")
         //为做笛卡尔积,把genres转成rdd
