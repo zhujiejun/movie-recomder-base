@@ -25,7 +25,7 @@ object App000 {
                 attr(5).trim, attr(6).trim, attr(7).trim, attr(8).trim, attr(9).trim)
         }
         }
-        movieRDD.saveToEs(ORIGINAL_MOVIE_COLUMN_FAMILY + "/docs")
+        movieRDD.saveToEs(ORIGINAL_MOVIE_COLUMN_FAMILY)
 
         val rating = spark.sparkContext.textFile(RATING_DATA_PATH)
         val ratingRDD = rating.map { item => {
@@ -33,7 +33,7 @@ object App000 {
             Rating(attr(0).toInt, attr(1).toInt, attr(2).toDouble, attr(3).toInt)
         }
         }
-        ratingRDD.saveToEs(ORIGINAL_RATING_COLUMN_FAMILY + "/docs")
+        ratingRDD.saveToEs(ORIGINAL_RATING_COLUMN_FAMILY)
 
         val tag = spark.sparkContext.textFile(TAG_DATA_PATH)
         val tagRDD = tag.map { item => {
@@ -41,7 +41,7 @@ object App000 {
             Tag(attr(0).toInt, attr(1).toInt, attr(2).trim, attr(3).toInt)
         }
         }
-        tagRDD.saveToEs(ORIGINAL_TAG_COLUMN_FAMILY + "/docs")
+        tagRDD.saveToEs(ORIGINAL_TAG_COLUMN_FAMILY)
 
         spark.stop()
     }

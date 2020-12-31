@@ -51,25 +51,25 @@ object Const {
     val TAG_DATA_PATH = "/home/cat/Downloads/common/tags.csv"
 
     //000原始数据表名称
-    val ORIGINAL_MOVIE_TABLE_NAME = "sfb_original"
-    val ORIGINAL_MOVIE_COLUMN_FAMILY = "original_movie"
-    val ORIGINAL_RATING_COLUMN_FAMILY = "original_rating"
-    val ORIGINAL_TAG_COLUMN_FAMILY = "original_tag"
+    //val ORIGINAL_MOVIE_TABLE_NAME = "sfb_original"
+    val ORIGINAL_MOVIE_COLUMN_FAMILY = "original_movie/docs"
+    val ORIGINAL_RATING_COLUMN_FAMILY = "original_rating/docs"
+    val ORIGINAL_TAG_COLUMN_FAMILY = "original_tag/docs"
 
     //001统计表名称
-    val STATIC_MOVIE_TABLE_NAME = "sfb_static"
-    val RATE_MORE_MOVIES_COLUMN_FAMILY = "rate_more_movies"
-    val RATE_MORE_RECENTLY_MOVIES_COLUMN_FAMILY = "rate_more_recently_movies"
-    val AVERAGE_MOVIES_COLUMN_FAMILY = "average_movies"
-    val GENRES_TOP_MOVIES_COLUMN_FAMILY = "genres_top_movies"
+    //val STATIC_MOVIE_TABLE_NAME = "sfb_static"
+    val RATE_MORE_MOVIES_COLUMN_FAMILY = "rate_more_movies/docs"
+    val RATE_MORE_RECENTLY_MOVIES_COLUMN_FAMILY = "rate_more_recently_movies/docs"
+    val AVERAGE_MOVIES_COLUMN_FAMILY = "average_movies/docs"
+    val GENRES_TOP_MOVIES_COLUMN_FAMILY = "genres_top_movies/docs"
 
     //002|003离线表名称
-    val OFFLINE_MOVIE_TABLE_NAME = "sfb_offline"
-    val MOVIE_FEATURES_RECS_COLUMN_FAMILY = "movie_features_matrix"
-    val MOVIE_CONTENTS_RECS_COLUMN_FAMILY = "movie_contents_matrix"
-    val OFFLINE_USER_RECS_COLUMN_FAMILY = "offline_user_recs"
+    //val OFFLINE_MOVIE_TABLE_NAME = "sfb_offline"
+    val MOVIE_FEATURES_RECS_COLUMN_FAMILY = "movie_features_matrix/docs"
+    val MOVIE_CONTENTS_RECS_COLUMN_FAMILY = "movie_contents_matrix/docs"
+    val OFFLINE_USER_RECS_COLUMN_FAMILY = "offline_user_recs/docs"
 
     //004|005实时表名称
-    val STREAM_MOVIE_TABLE_NAME = "sfb_stream"
-    val STREAM_USER_RECS_COLUMN_FAMILY = "stream_user_recs"
+    //val STREAM_MOVIE_TABLE_NAME = "sfb_stream"
+    val STREAM_USER_RECS_COLUMN_FAMILY = "stream_user_recs/docs"
 }
