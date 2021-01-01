@@ -1,0 +1,15 @@
+project(':service-006') {
+    dependencies {
+        implementation 'redis.clients:jedis'
+        implementation project(':service-000')
+        implementation 'org.apache.kafka:kafka-clients'
+        implementation 'org.scala-lang:scala-library:2.11.12'
+        implementation 'org.apache.spark:spark-core_2.11:2.4.5'
+        implementation 'org.apache.spark:spark-sql_2.11:2.4.5'
+        implementation 'org.apache.spark:spark-streaming_2.11:2.4.5'
+        implementation 'org.apache.spark:spark-streaming-kafka-0-10_2.11:2.4.5'
+        implementation 'org.elasticsearch.client:transport:7.8.0'
+        implementation 'org.elasticsearch:elasticsearch-spark-20_2.11:7.8.0'
+    }
+}
+mainClassName = 'com.zhujiejun.recomder.App006'
