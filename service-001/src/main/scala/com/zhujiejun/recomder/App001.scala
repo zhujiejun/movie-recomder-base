@@ -4,7 +4,7 @@ import com.zhujiejun.recomder.cons.Const._
 import com.zhujiejun.recomder.data._
 import com.zhujiejun.recomder.util.SFBUtil._
 import org.apache.spark.SparkConf
-import org.apache.spark.sql.{Encoder, Encoders, SparkSession}
+import org.apache.spark.sql.SparkSession
 import org.elasticsearch.spark.sparkRDDFunctions
 import org.elasticsearch.spark.sql.EsSparkSQL
 
@@ -22,25 +22,21 @@ object App001 {
         val spark = SparkSession.builder().config(sparkConfig).getOrCreate()
 
         import spark.implicits._
-        implicit val movieEncoder: Encoder[Movie] = Encoders.bean(classOf[Movie])
         val movieDF = EsSparkSQL.esDF(spark, ORIGINAL_MOVIE_INDEX).orderBy("mid")
             .as[Movie].toDF()
-        movieDF.show()
 
-        implicit val ratingEncoder: Encoder[Rating] = Encoders.bean(classOf[Rating])
         val ratingDF = EsSparkSQL.esDF(spark, ORIGINAL_RATING_INDEX).orderBy("uid", "mid")
             .as[Rating].toDF()
-        ratingDF.show()
 
         //创建名为ratings_tmp的临时表
         ratingDF.createOrReplaceTempView("ratings_tmp")
 
         //不同的统计推荐结果
         //1.历史热门统计,历史评分数据最多,mid,count
-        implicit val encoder1: Encoder[RateMoreMovie] = Encoders.bean(classOf[RateMoreMovie])
         val rateMoreMoviesRDD = spark.sql("select mid, count(mid) count from ratings_tmp group by mid")
-            .as[RateMoreMovie].rdd
-        rateMoreMoviesRDD.toDF().show()
+            .toDF("mid", "count")
+            .as[RateMoreMovie]
+            .rdd
         rateMoreMoviesRDD.saveToEs(RATE_MORE_MOVIES_INDEX)
 
         //2.近期热门统计,按照"yyyyMM"格式选取最近的评分数据,统计评分个数,mid,count,yearmonth
@@ -50,23 +46,27 @@ object App001 {
         val ratingOfYearMonthDF = spark.sql("select mid, score, toYearMonth(timestamp) yearmonth from ratings_tmp")
         ratingOfYearMonthDF.createOrReplaceTempView("rating_of_month")
         //从rating_of_month中查找电影在各个月份的评分,mid,count,yearmonth
-        implicit val encoder2: Encoder[RateMoreRecentlyMovie] = Encoders.bean(classOf[RateMoreRecentlyMovie])
         val rateMoreRecentlyMoviesRDD = spark.sql("select mid, count(mid) count, yearmonth from rating_of_month " +
-            "group by yearmonth, mid order by yearmonth desc, count desc").as[RateMoreRecentlyMovie].rdd
+            "group by yearmonth, mid order by yearmonth desc, count desc")
+            .toDF("mid", "count", "yearmonth")
+            .as[RateMoreRecentlyMovie]
+            .rdd
         rateMoreRecentlyMoviesRDD.saveToEs(RATE_MORE_RECENTLY_MOVIES_INDEX)
 
         //3.优质电影统计,统计电影的平均评分,mid,avg
-        implicit val encoder3: Encoder[AverageMovie] = Encoders.bean(classOf[AverageMovie])
         val averageMoviesRDD = spark.sql("select mid, avg(score) avg from ratings_tmp group by mid")
-            .as[AverageMovie].rdd
+            .toDF("mid", "avg")
+            .as[AverageMovie]
+            .rdd
         averageMoviesRDD.saveToEs(AVERAGE_MOVIES_INDEX)
 
-        //4.各类别电影Top统计,mid,avg
+        //4.各类别电影Top统计,genre,mid,avg
         //定义所有类别
         val genres = List("Action", "Adventure", "Animation", "Comedy", "Crime", "Documentary",
             "Drama", "Family", "Fantasy", "Foreign", "History", "Horror", "Music", "Mystery",
             "Romance", "Science", "Tv", "Thriller", "War", "Western")
-        //把平均评分加入movie表里,加一列,inner join,mid,name,descri,timelong,issue,shoot,language,genres,actors,directors,avg
+        //把平均评分加入movie表里,加一列,inner join,mid,name,descri,timelong,issue,shoot,language,genres,
+        //actors,directors,avg
         val movieWithScoreDF = movieDF.join(averageMoviesRDD.toDF(), "mid")
         //为做笛卡尔积,把genres转成rdd
         val genresRDD = spark.sparkContext.makeRDD(genres)
@@ -77,7 +77,8 @@ object App001 {
                 case (genre, movieRow) => movieRow.getAs[String]("genres").toLowerCase.contains(genre.toLowerCase)
             }
             .map {
-                case (genre, movieRow) => (genre, (movieRow.getAs[Int]("mid"), movieRow.getAs[Double]("avg")))
+                //.toString.toInt
+                case (genre, movieRow) => (genre, (movieRow.getAs[Long]("mid").toString.toInt, movieRow.getAs[Double]("avg")))
             }
             .groupByKey
             .map {

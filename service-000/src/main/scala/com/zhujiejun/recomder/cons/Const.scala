@@ -49,24 +49,20 @@ object Const {
     val MOVIE_DATA_PATH = "/home/cat/Downloads/common/movies.csv"
     val RATING_DATA_PATH = "/home/cat/Downloads/common/ratings.csv"
     val TAG_DATA_PATH = "/home/cat/Downloads/common/tags.csv"
-
     //Type names are deprecated and will be removed in a later release.
-    //000原始数据表名称
+    //000原始数据索引名称
     val ORIGINAL_MOVIE_INDEX = "original_movie_index"
     val ORIGINAL_RATING_INDEX = "original_rating_index"
     val ORIGINAL_TAG_INDEX = "original_tag_index"
-
-    //001统计表名称
+    //001统计索引名称
     val RATE_MORE_MOVIES_INDEX = "rate_more_movies_index"
     val RATE_MORE_RECENTLY_MOVIES_INDEX = "rate_more_recently_movies_index"
     val AVERAGE_MOVIES_INDEX = "average_movies_index"
     val GENRES_TOP_MOVIES_INDEX = "genres_top_movies_index"
-
-    //002|003离线表名称
+    //002|003离线索引名称
     val OFFLINE_USER_RECS_INDEX = "offline_user_recs_index"
     val MOVIE_FEATURES_RECS_INDEX = "movie_features_matrix_index"
     val MOVIE_CONTENTS_RECS_INDEX = "movie_contents_matrix_index"
-
-    //004|005实时表名称
+    //004|005实时索引名称
     val STREAM_USER_RECS_INDEX = "stream_user_recs_index"
 }

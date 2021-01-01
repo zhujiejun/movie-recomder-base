@@ -18,13 +18,13 @@ object App002 {
             .set("spark.driver.cores", "6")
             .set("spark.driver.memory", "512m")
             .set("spark.executor.cores", "6")
-            .set("spark.executor.memory", "4g")
+            .set("spark.executor.memory", "2g")
             .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
             .registerKryoClasses(Array(classOf[MovieSearch], classOf[RatingSearch], classOf[TagSearch]))
         val spark = SparkSession.builder().config(sparkConfig).getOrCreate()
 
         import spark.implicits._
-        val ratingRDD = EsSparkSQL.esDF(spark, ORIGINAL_RATING_INDEX).as[MovieRating].rdd.map { rating =>
+        val ratingRDD = EsSparkSQL.esDF(spark, ORIGINAL_RATING_INDEX).as[Rating].rdd.map { rating =>
             (rating.uid.toInt, rating.mid.toInt, rating.score) //转化成rdd,并且去掉时间戳
         } /*.cache()*/
 
@@ -60,7 +60,7 @@ object App002 {
         //基于用户和电影的隐特征,计算预测评分,得到用户的推荐列表
         //计算user和movie的笛卡尔积,得到一个空评分矩阵
         //从rating数据中提取所有的uid和mid,并去重
-        val userRDD = ratingRDD.map(_._1).distinct()
+        /*val userRDD = ratingRDD.map(_._1).distinct()
         val movieRDD = ratingRDD.map(_._2).distinct()
         val userMoviesRDD = userRDD.cartesian(movieRDD)
         //调用model的predict方法预测评分
@@ -77,7 +77,7 @@ object App002 {
                 case (uid, recs) => UserRecs(uid, recs.toList.sortWith(_._2 > _._2).take(USER_MAX_RECOMMENDATION)
                     .map(x => Recommendation(x._1, x._2)))
             }
-        offlineUserRecsRDD.saveToEs(OFFLINE_USER_RECS_INDEX)
+        offlineUserRecsRDD.saveToEs(OFFLINE_USER_RECS_INDEX)*/
 
         spark.close()
     }

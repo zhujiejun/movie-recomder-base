@@ -62,11 +62,11 @@ object ESDemo {
                 attr(5).trim, attr(6).trim, attr(7).trim, attr(8).trim, attr(9).trim)
         }
         }
-        movieRDD.saveToEs(ORIGINAL_MOVIE_COLUMN_FAMILY)
+        movieRDD.saveToEs(ORIGINAL_MOVIE_INDEX)
 
         //implicit val encoder: Encoder[Movie] = Encoders.kryo(classOf[Movie])
         implicit val encoder: Encoder[Movie] = Encoders.bean(classOf[Movie])
-        val df = EsSparkSQL.esDF(spark, ORIGINAL_MOVIE_COLUMN_FAMILY)
+        val df = EsSparkSQL.esDF(spark, ORIGINAL_MOVIE_INDEX)
             //.select("mid", "name", "descri", "timelong", "issue", "shoot","language", "genres", "actors", "directors")*/ //排序
             .orderBy("mid")
         df.show()
