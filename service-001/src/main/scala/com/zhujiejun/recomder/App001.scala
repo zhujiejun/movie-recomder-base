@@ -37,11 +37,11 @@ object App001 {
 
         //不同的统计推荐结果
         //1.历史热门统计,历史评分数据最多,mid,count
-        implicit val encoder1: Encoder[RateMoreMovie] = Encoders.bean(classOf[RateMoreMovie])
+        /*implicit val encoder1: Encoder[RateMoreMovie] = Encoders.bean(classOf[RateMoreMovie])
         val rateMoreMoviesRDD = spark.sql("select mid, count(mid) count from ratings_tmp group by mid")
             .as[RateMoreMovie].rdd
         rateMoreMoviesRDD.toDF().show()
-        rateMoreMoviesRDD.saveToEs(RATE_MORE_MOVIES_COLUMN_FAMILY)
+        rateMoreMoviesRDD.saveToEs(RATE_MORE_MOVIES_COLUMN_FAMILY)*/
 
         //2.近期热门统计,按照"yyyyMM"格式选取最近的评分数据,统计评分个数,mid,count,yearmonth
         //注册udf,把时间戳转换成年月格式

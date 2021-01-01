@@ -50,6 +50,7 @@ object Const {
     val RATING_DATA_PATH = "/home/cat/Downloads/common/ratings.csv"
     val TAG_DATA_PATH = "/home/cat/Downloads/common/tags.csv"
 
+    //Type names are deprecated and will be removed in a later release.
     //000原始数据表名称
     //val ORIGINAL_MOVIE_TABLE_NAME = "sfb_original"
     val ORIGINAL_MOVIE_COLUMN_FAMILY = "original_movie/docs"

@@ -27,8 +27,8 @@ object App003 {
         import spark.implicits._
         val movieTagsDF = EsSparkSQL.esDF(spark, ORIGINAL_MOVIE_COLUMN_FAMILY).as[Movie].rdd.map { movie =>
             //提取mid,name,genres三项作为原始内容特征,分词器默认按照空格做分词
-            (movie.mid, movie.name, movie.genres.map(c => if (c == '|') ' ' else c))
-        }.toDF() /*.cache()*/
+            (movie.mid.toInt, movie.name, movie.genres.map(c => if (c == '|') ' ' else c))
+        }.toDF("mid", "name", "genres") /*.cache()*/
 
         //核心部分： 用TF-IDF从内容信息中提取电影特征向量
         //创建一个分词器,默认按空格分词
