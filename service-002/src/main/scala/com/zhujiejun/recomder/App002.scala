@@ -2,31 +2,32 @@ package com.zhujiejun.recomder
 
 import com.zhujiejun.recomder.cons.Const._
 import com.zhujiejun.recomder.data._
-import com.zhujiejun.recomder.util.HBaseUtil
-import com.zhujiejun.recomder.util.HBaseUtil.{checkTableExistInHabse, consinSim}
+import com.zhujiejun.recomder.util.ElasticUtil._
 import org.apache.spark.SparkConf
 import org.apache.spark.mllib.recommendation.{ALS, Rating => MLRating}
 import org.apache.spark.sql.SparkSession
+import org.elasticsearch.spark.sparkRDDFunctions
+import org.elasticsearch.spark.sql.EsSparkSQL
 import org.jblas.DoubleMatrix
 
 object App002 {
     def main(args: Array[String]): Unit = {
-        val sparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_002_NAME)
-        sparkConf
+        val sparkConfig: SparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_002_NAME)
+        sparkConfig
+            .setAll(ELASTICS_PARAM)
             .set("spark.driver.cores", "6")
-            .set("spark.driver.memory", "1g")
+            .set("spark.driver.memory", "512m")
             .set("spark.executor.cores", "6")
-            .set("spark.executor.memory", "2g")
+            .set("spark.executor.memory", "4g")
             .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
             .registerKryoClasses(Array(classOf[MovieSearch], classOf[RatingSearch], classOf[TagSearch]))
-        val spark = SparkSession.builder().config(sparkConf).getOrCreate()
+        val spark = SparkSession.builder().config(sparkConfig).getOrCreate()
 
         import spark.implicits._
-        checkTableExistInHabse(OFFLINE_MOVIE_TABLE_NAME)
-        val ratings: List[Rating] = HBaseUtil.getRatingsFromHbase(ORIGINAL_MOVIE_TABLE_NAME, ORIGINAL_RATING_COLUMN_FAMILY)
-        val ratingRDD = spark.sparkContext.parallelize(ratings).map { rating =>
-            (rating.uid, rating.mid, rating.score) //转化成rdd,并且去掉时间戳
-        }.cache()
+        val ratingRDD = EsSparkSQL.esDF(spark, ORIGINAL_RATING_COLUMN_FAMILY).as[MovieRating].rdd.map { rating =>
+            (rating.uid.toInt, rating.mid.toInt, rating.score) //转化成rdd,并且去掉时间戳
+        }/*.cache()*/
+
         //从rating数据中提取所有的uid和mid,并去重
         val userRDD = ratingRDD.map(_._1).distinct()
         val movieRDD = ratingRDD.map(_._2).distinct()
@@ -40,7 +41,7 @@ object App002 {
         val userMoviesRDD = userRDD.cartesian(movieRDD)
         //调用model的predict方法预测评分
         val preRatings = model.predict(userMoviesRDD)
-        val userRecsDS = preRatings
+        val offlineUserRecsRDD = preRatings
             .filter {
                 _.rating > 0 //过滤出评分大于0的项
             }
@@ -51,22 +52,15 @@ object App002 {
             .map {
                 case (uid, recs) => UserRecs(uid, recs.toList.sortWith(_._2 > _._2).take(USER_MAX_RECOMMENDATION)
                     .map(x => Recommendation(x._1, x._2)))
-            }.toDS()
-        userRecsDS.foreach { userRecs =>
-            val rowKey = userRecs.uid.toString
-            userRecs.recs.foreach { item =>
-                val mid = item.mid.toString
-                val score = item.score.toString
-                HBaseUtil.addRowData(OFFLINE_MOVIE_TABLE_NAME, rowKey, OFFLINE_USER_RECS_COLUMN_FAMILY, mid, score)
             }
-        }
+        offlineUserRecsRDD.saveToEs(OFFLINE_USER_RECS_COLUMN_FAMILY)
 
         //基于电影隐特征,计算相似度矩阵,得到电影的相似度列表
         val movieFeaturesRDD = model.productFeatures.map {
             case (mid, features) => (mid, new DoubleMatrix(features))
         }
         //对所有电影两两计算它们的相似度,先做笛卡尔积
-        val movieRecsDS = movieFeaturesRDD.cartesian(movieFeaturesRDD)
+        val movieFeaturesMatrixRDD = movieFeaturesRDD.cartesian(movieFeaturesRDD)
             .filter {
                 case (a, b) => a._1 != b._1 //把自己跟自己的配对过滤掉
             }
@@ -81,15 +75,8 @@ object App002 {
             .map {
                 case (mid, items) => MovieRecs(mid, items.toList.sortWith(_._2 > _._2)
                     .map(x => Recommendation(x._1, x._2)))
-            }.toDS()
-        movieRecsDS.foreach { movieRecs =>
-            val rowKey = movieRecs.mid.toString
-            movieRecs.recs.foreach { item =>
-                val mid = item.mid.toString
-                val score = item.score.toString
-                HBaseUtil.addRowData(OFFLINE_MOVIE_TABLE_NAME, rowKey, MOVIE_FEATURES_RECS_COLUMN_FAMILY, mid, score)
             }
-        }
+        movieFeaturesMatrixRDD.saveToEs(MOVIE_FEATURES_RECS_COLUMN_FAMILY)
 
         spark.close()
     }
