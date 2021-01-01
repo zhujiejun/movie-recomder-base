@@ -65,9 +65,9 @@ object Const {
 
     //002|003离线表名称
     //val OFFLINE_MOVIE_TABLE_NAME = "sfb_offline"
+    val OFFLINE_USER_RECS_COLUMN_FAMILY = "offline_user_recs/docs"
     val MOVIE_FEATURES_RECS_COLUMN_FAMILY = "movie_features_matrix/docs"
     val MOVIE_CONTENTS_RECS_COLUMN_FAMILY = "movie_contents_matrix/docs"
-    val OFFLINE_USER_RECS_COLUMN_FAMILY = "offline_user_recs/docs"
 
     //004|005实时表名称
     //val STREAM_MOVIE_TABLE_NAME = "sfb_stream"
