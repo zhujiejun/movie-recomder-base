@@ -2,7 +2,7 @@ package com.zhujiejun.recomder
 
 import com.zhujiejun.recomder.cons.Const._
 import com.zhujiejun.recomder.data._
-import com.zhujiejun.recomder.util.ElasticUtil._
+import com.zhujiejun.recomder.util.SFBUtil._
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.{Encoder, Encoders, SparkSession}
 import org.elasticsearch.spark.sparkRDDFunctions
@@ -10,7 +10,7 @@ import org.elasticsearch.spark.sql.EsSparkSQL
 
 object App001 {
     def main(args: Array[String]): Unit = {
-        val sparkConfig :SparkConf= new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_001_NAME)
+        val sparkConfig: SparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_001_NAME)
         sparkConfig
             .setAll(ELASTICS_PARAM)
             .set("spark.driver.cores", "6")
@@ -23,12 +23,12 @@ object App001 {
 
         import spark.implicits._
         implicit val movieEncoder: Encoder[Movie] = Encoders.bean(classOf[Movie])
-        val movieDF = EsSparkSQL.esDF(spark, ORIGINAL_MOVIE_COLUMN_FAMILY).orderBy("mid")
+        val movieDF = EsSparkSQL.esDF(spark, ORIGINAL_MOVIE_INDEX).orderBy("mid")
             .as[Movie].toDF()
         movieDF.show()
 
         implicit val ratingEncoder: Encoder[Rating] = Encoders.bean(classOf[Rating])
-        val ratingDF = EsSparkSQL.esDF(spark, ORIGINAL_RATING_COLUMN_FAMILY).orderBy("uid", "mid")
+        val ratingDF = EsSparkSQL.esDF(spark, ORIGINAL_RATING_INDEX).orderBy("uid", "mid")
             .as[Rating].toDF()
         ratingDF.show()
 
@@ -37,11 +37,11 @@ object App001 {
 
         //不同的统计推荐结果
         //1.历史热门统计,历史评分数据最多,mid,count
-        /*implicit val encoder1: Encoder[RateMoreMovie] = Encoders.bean(classOf[RateMoreMovie])
+        implicit val encoder1: Encoder[RateMoreMovie] = Encoders.bean(classOf[RateMoreMovie])
         val rateMoreMoviesRDD = spark.sql("select mid, count(mid) count from ratings_tmp group by mid")
             .as[RateMoreMovie].rdd
         rateMoreMoviesRDD.toDF().show()
-        rateMoreMoviesRDD.saveToEs(RATE_MORE_MOVIES_COLUMN_FAMILY)*/
+        rateMoreMoviesRDD.saveToEs(RATE_MORE_MOVIES_INDEX)
 
         //2.近期热门统计,按照"yyyyMM"格式选取最近的评分数据,统计评分个数,mid,count,yearmonth
         //注册udf,把时间戳转换成年月格式
@@ -53,13 +53,13 @@ object App001 {
         implicit val encoder2: Encoder[RateMoreRecentlyMovie] = Encoders.bean(classOf[RateMoreRecentlyMovie])
         val rateMoreRecentlyMoviesRDD = spark.sql("select mid, count(mid) count, yearmonth from rating_of_month " +
             "group by yearmonth, mid order by yearmonth desc, count desc").as[RateMoreRecentlyMovie].rdd
-        rateMoreRecentlyMoviesRDD.saveToEs(RATE_MORE_RECENTLY_MOVIES_COLUMN_FAMILY)
+        rateMoreRecentlyMoviesRDD.saveToEs(RATE_MORE_RECENTLY_MOVIES_INDEX)
 
         //3.优质电影统计,统计电影的平均评分,mid,avg
         implicit val encoder3: Encoder[AverageMovie] = Encoders.bean(classOf[AverageMovie])
         val averageMoviesRDD = spark.sql("select mid, avg(score) avg from ratings_tmp group by mid")
             .as[AverageMovie].rdd
-        averageMoviesRDD.saveToEs(AVERAGE_MOVIES_COLUMN_FAMILY)
+        averageMoviesRDD.saveToEs(AVERAGE_MOVIES_INDEX)
 
         //4.各类别电影Top统计,mid,avg
         //定义所有类别
@@ -84,7 +84,7 @@ object App001 {
                 case (genre, items) => GenresRecommendation(genre, items.toList.sortWith(_._2 > _._2).take(10)
                     .map(item => Recommendation(item._1, item._2)))
             }
-        genresTopMoviesRDD.saveToEs(GENRES_TOP_MOVIES_COLUMN_FAMILY)
+        genresTopMoviesRDD.saveToEs(GENRES_TOP_MOVIES_INDEX)
 
         spark.close()
     }

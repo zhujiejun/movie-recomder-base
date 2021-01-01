@@ -6,7 +6,7 @@ import org.jblas.DoubleMatrix
 import java.time.format.DateTimeFormatter
 import java.time.{Instant, LocalDateTime, ZoneId}
 
-object ElasticUtil {
+object SFBUtil {
     //求向量余弦相似度
     def consinSim(movie1: DoubleMatrix, movie2: DoubleMatrix): Double = {
         movie1.dot(movie2) / (movie1.norm2() * movie2.norm2())

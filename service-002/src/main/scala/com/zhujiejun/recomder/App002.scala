@@ -2,7 +2,7 @@ package com.zhujiejun.recomder
 
 import com.zhujiejun.recomder.cons.Const._
 import com.zhujiejun.recomder.data._
-import com.zhujiejun.recomder.util.ElasticUtil._
+import com.zhujiejun.recomder.util.SFBUtil._
 import org.apache.spark.SparkConf
 import org.apache.spark.mllib.recommendation.{ALS, Rating => MLRating}
 import org.apache.spark.sql.SparkSession
@@ -24,16 +24,15 @@ object App002 {
         val spark = SparkSession.builder().config(sparkConfig).getOrCreate()
 
         import spark.implicits._
-        val ratingRDD = EsSparkSQL.esDF(spark, ORIGINAL_RATING_COLUMN_FAMILY).as[MovieRating].rdd.map { rating =>
+        val ratingRDD = EsSparkSQL.esDF(spark, ORIGINAL_RATING_INDEX).as[MovieRating].rdd.map { rating =>
             (rating.uid.toInt, rating.mid.toInt, rating.score) //转化成rdd,并且去掉时间戳
-        }/*.cache()*/
-        
+        } /*.cache()*/
+
         //训练隐语义模型
         val trainData = ratingRDD.map(x => MLRating(x._1, x._2, x._3))
         //val (rank, iterations, lambda) = (200, 5, 0.1)
         val (rank, iterations, lambda) = (300, 5, 0.9074302725757746)
         val model = ALS.train(trainData, rank, iterations, lambda)
-
         //基于电影隐特征,计算相似度矩阵,得到电影的相似度列表
         val movieFeaturesRDD = model.productFeatures.map {
             case (mid, features) => (mid, new DoubleMatrix(features))
@@ -55,7 +54,8 @@ object App002 {
                 case (mid, items) => MovieRecs(mid, items.toList.sortWith(_._2 > _._2)
                     .map(x => Recommendation(x._1, x._2)))
             }
-        movieFeaturesMatrixRDD.saveToEs(MOVIE_FEATURES_RECS_COLUMN_FAMILY)
+        movieFeaturesMatrixRDD.saveToEs(MOVIE_FEATURES_RECS_INDEX)
+
 
         //基于用户和电影的隐特征,计算预测评分,得到用户的推荐列表
         //计算user和movie的笛卡尔积,得到一个空评分矩阵
@@ -77,7 +77,7 @@ object App002 {
                 case (uid, recs) => UserRecs(uid, recs.toList.sortWith(_._2 > _._2).take(USER_MAX_RECOMMENDATION)
                     .map(x => Recommendation(x._1, x._2)))
             }
-        offlineUserRecsRDD.saveToEs(OFFLINE_USER_RECS_COLUMN_FAMILY)
+        offlineUserRecsRDD.saveToEs(OFFLINE_USER_RECS_INDEX)
 
         spark.close()
     }

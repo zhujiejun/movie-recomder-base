@@ -2,7 +2,7 @@ package com.zhujiejun.recomder
 
 import com.zhujiejun.recomder.cons.Const._
 import com.zhujiejun.recomder.data._
-import com.zhujiejun.recomder.util.ElasticUtil._
+import com.zhujiejun.recomder.util.SFBUtil._
 import org.apache.spark.SparkConf
 import org.apache.spark.ml.feature.{HashingTF, IDF, Tokenizer}
 import org.apache.spark.ml.linalg.SparseVector
@@ -25,7 +25,7 @@ object App003 {
         val spark = SparkSession.builder().config(sparkConfig).getOrCreate()
 
         import spark.implicits._
-        val movieTagsDF = EsSparkSQL.esDF(spark, ORIGINAL_MOVIE_COLUMN_FAMILY).as[Movie].rdd.map { movie =>
+        val movieTagsDF = EsSparkSQL.esDF(spark, ORIGINAL_MOVIE_INDEX).as[Movie].rdd.map { movie =>
             //提取mid,name,genres三项作为原始内容特征,分词器默认按照空格做分词
             (movie.mid.toInt, movie.name, movie.genres.map(c => if (c == '|') ' ' else c))
         }.toDF("mid", "name", "genres") /*.cache()*/
@@ -70,7 +70,7 @@ object App003 {
                 case (mid, items) => MovieRecs(mid, items.toList.sortWith(_._2 > _._2)
                     .map(x => Recommendation(x._1, x._2)))
             }
-        movieContentsMatrixRDD.saveToEs(MOVIE_CONTENTS_RECS_COLUMN_FAMILY)
+        movieContentsMatrixRDD.saveToEs(MOVIE_CONTENTS_RECS_INDEX)
 
         spark.stop()
     }
