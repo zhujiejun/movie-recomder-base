@@ -1,6 +1,14 @@
 package com.zhujiejun.recomder
 
 import com.zhujiejun.recomder.cons.Const._
+import com.zhujiejun.recomder.data._
+import org.apache.spark.SparkConf
+import org.apache.spark.mllib.recommendation.{ALS, Rating => MLRating}
+import org.apache.spark.sql.SparkSession
+import org.elasticsearch.spark.sparkRDDFunctions
+import org.elasticsearch.spark.sql.EsSparkSQL
+
+import com.zhujiejun.recomder.cons.Const._
 import com.zhujiejun.recomder.util.LogProcessorSupplier
 import org.apache.kafka.streams.{KafkaStreams, StreamsConfig, Topology}
 

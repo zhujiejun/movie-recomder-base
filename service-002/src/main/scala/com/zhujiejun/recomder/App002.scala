@@ -56,29 +56,6 @@ object App002 {
             }
         movieFeaturesMatrixRDD.saveToEs(MOVIE_FEATURES_RECS_INDEX)
 
-
-        //基于用户和电影的隐特征,计算预测评分,得到用户的推荐列表
-        //计算user和movie的笛卡尔积,得到一个空评分矩阵
-        //从rating数据中提取所有的uid和mid,并去重
-        /*val userRDD = ratingRDD.map(_._1).distinct()
-        val movieRDD = ratingRDD.map(_._2).distinct()
-        val userMoviesRDD = userRDD.cartesian(movieRDD)
-        //调用model的predict方法预测评分
-        val preRatings = model.predict(userMoviesRDD)
-        val offlineUserRecsRDD = preRatings
-            .filter {
-                _.rating > 0 //过滤出评分大于0的项
-            }
-            .map { rating =>
-                (rating.user, (rating.product, rating.rating))
-            }
-            .groupByKey
-            .map {
-                case (uid, recs) => UserRecs(uid, recs.toList.sortWith(_._2 > _._2).take(USER_MAX_RECOMMENDATION)
-                    .map(x => Recommendation(x._1, x._2)))
-            }
-        offlineUserRecsRDD.saveToEs(OFFLINE_USER_RECS_INDEX)*/
-
         spark.close()
     }
 }
