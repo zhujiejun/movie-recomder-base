@@ -1,9 +1,8 @@
-package com.zhujiejun.recomder.util
+package com.zhujiejun.recomder.util.log
 
 import org.apache.kafka.streams.processor.{Processor, ProcessorContext}
 
-class LogProcessor() extends Processor[Array[Byte], Array[Byte]] {
-
+class SfbLogProcessor() extends Processor[Array[Byte], Array[Byte]] {
     var context: Option[ProcessorContext] = None
 
     override def init(context: ProcessorContext): Unit = {

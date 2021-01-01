@@ -1,4 +1,4 @@
-package com.zhujiejun.recomder.demo
+package com.zhujiejun.recomder.dem
 
 import com.zhujiejun.recomder.cons.Const._
 import com.zhujiejun.recomder.data._
