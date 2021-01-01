@@ -8,28 +8,51 @@ import org.apache.spark.sql.SparkSession
 import org.elasticsearch.spark.sparkRDDFunctions
 import org.elasticsearch.spark.sql.EsSparkSQL
 
-import com.zhujiejun.recomder.cons.Const._
-import com.zhujiejun.recomder.util.LogProcessorSupplier
-import org.apache.kafka.streams.{KafkaStreams, StreamsConfig, Topology}
-
-import java.util.Properties
-
 object App004 {
     def main(args: Array[String]): Unit = {
-        //定义kafka streaming的配置
-        val settings = new Properties()
-        settings.put(StreamsConfig.APPLICATION_ID_CONFIG, SERVICE_003_NAME)
-        settings.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, CONFIG("kafka.brokers"))
-        //settings.put(StreamsConfig.ZOOKEEPER_CONNECT_CONFIG, CONFIG("zookeepers"))
+        val sparkConfig: SparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_002_NAME)
+        sparkConfig
+            .setAll(ELASTICS_PARAM)
+            .set("spark.driver.cores", "6")
+            .set("spark.driver.memory", "512m")
+            .set("spark.executor.cores", "6")
+            .set("spark.executor.memory", "2g")
+            .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+            .registerKryoClasses(Array(classOf[MovieSearch], classOf[RatingSearch], classOf[TagSearch]))
+        val spark = SparkSession.builder().config(sparkConfig).getOrCreate()
 
-        //创建一个拓扑建构器
-        val topology: Topology = new Topology()
-        //定义流处理的拓扑结构
-        topology.addSource("SOURCE", CONFIG("kafka.from.topic"))
-            .addProcessor("PROCESSOR", LogProcessorSupplier(), "SOURCE")
-            .addSink("SINK", CONFIG("kafka.to.topic"), "PROCESSOR")
-        val streams = new KafkaStreams(topology, settings)
-        streams.start()
-        println("Kafka stream started!>>>>>>>>>>>")
+        import spark.implicits._
+        val ratingRDD = EsSparkSQL.esDF(spark, ORIGINAL_RATING_INDEX).as[Rating].rdd.map { rating =>
+            (rating.uid.toInt, rating.mid.toInt, rating.score) //转化成rdd,并且去掉时间戳
+        } /*.cache()*/
+
+        //训练隐语义模型
+        val trainData = ratingRDD.map(x => MLRating(x._1, x._2, x._3))
+        //val (rank, iterations, lambda) = (200, 5, 0.1)
+        val (rank, iterations, lambda) = (300, 5, 0.9074302725757746)
+        val model = ALS.train(trainData, rank, iterations, lambda)
+        //基于用户和电影的隐特征,计算预测评分,得到用户的推荐列表
+        //计算user和movie的笛卡尔积,得到一个空评分矩阵
+        //从rating数据中提取所有的uid和mid,并去重
+        val userRDD = ratingRDD.map(_._1).distinct()
+        val movieRDD = ratingRDD.map(_._2).distinct()
+        val userMoviesRDD = userRDD.cartesian(movieRDD)
+        //调用model的predict方法预测评分
+        val preRatings = model.predict(userMoviesRDD)
+        val offlineUserRecsRDD = preRatings
+            .filter {
+                _.rating > 0 //过滤出评分大于0的项
+            }
+            .map { rating =>
+                (rating.user, (rating.product, rating.rating))
+            }
+            .groupByKey
+            .map {
+                case (uid, recs) => UserRecs(uid, recs.toList.sortWith(_._2 > _._2).take(USER_MAX_RECOMMENDATION)
+                    .map(x => Recommendation(x._1, x._2)))
+            }
+        offlineUserRecsRDD.saveToEs(OFFLINE_USER_RECS_INDEX)
+
+        spark.close()
     }
 }
