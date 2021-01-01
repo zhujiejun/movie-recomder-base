@@ -2,33 +2,34 @@ package com.zhujiejun.recomder
 
 import com.zhujiejun.recomder.cons.Const._
 import com.zhujiejun.recomder.data._
-import com.zhujiejun.recomder.util.HBaseUtil
-import com.zhujiejun.recomder.util.HBaseUtil.{checkTableExistInHabse, consinSim}
+import com.zhujiejun.recomder.util.ElasticUtil._
 import org.apache.spark.SparkConf
 import org.apache.spark.ml.feature.{HashingTF, IDF, Tokenizer}
 import org.apache.spark.ml.linalg.SparseVector
 import org.apache.spark.sql.SparkSession
+import org.elasticsearch.spark.sparkRDDFunctions
+import org.elasticsearch.spark.sql.EsSparkSQL
 import org.jblas.DoubleMatrix
 
 object App003 {
     def main(args: Array[String]): Unit = {
-        val sparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_005_NAME)
-        sparkConf
+        val sparkConfig: SparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_005_NAME)
+        sparkConfig
+            .setAll(ELASTICS_PARAM)
             .set("spark.driver.cores", "6")
             .set("spark.driver.memory", "1g ")
             .set("spark.executor.cores", "6")
             .set("spark.executor.memory", "2g")
             .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
             .registerKryoClasses(Array(classOf[MovieSearch], classOf[RatingSearch], classOf[TagSearch]))
-        val spark = SparkSession.builder().config(sparkConf).getOrCreate()
+        val spark = SparkSession.builder().config(sparkConfig).getOrCreate()
 
         import spark.implicits._
-        checkTableExistInHabse(OFFLINE_MOVIE_TABLE_NAME)
-        val movies: List[Movie] = HBaseUtil.getMoviesFromHbase(ORIGINAL_MOVIE_TABLE_NAME, ORIGINAL_MOVIE_COLUMN_FAMILY)
-        val movieTagsDF = spark.sparkContext.parallelize(movies).map { m =>
+        val movieTagsDF = EsSparkSQL.esDF(spark, ORIGINAL_MOVIE_COLUMN_FAMILY).as[Movie].rdd.map { movie =>
             //提取mid,name,genres三项作为原始内容特征,分词器默认按照空格做分词
-            (m.mid, m.name, m.genres.map(c => if (c == '|') ' ' else c))
-        }.toDF("mid", "name", "genres").cache()
+            (movie.mid, movie.name, movie.genres.map(c => if (c == '|') ' ' else c))
+        }.toDF() /*.cache()*/
+
         //核心部分： 用TF-IDF从内容信息中提取电影特征向量
         //创建一个分词器,默认按空格分词
         val tokenizer = new Tokenizer().setInputCol("genres").setOutputCol("words")
@@ -53,7 +54,7 @@ object App003 {
         }
         //movieFeatures.collect().foreach(println)
         //对所有电影两两计算它们的相似度,先做笛卡尔积
-        val movieRecsDS = movieContentsRDD.cartesian(movieContentsRDD)
+        val movieContentsMatrixRDD = movieContentsRDD.cartesian(movieContentsRDD)
             .filter {
                 case (a, b) => a._1 != b._1 //把自己跟自己的配对过滤掉
             }
@@ -68,15 +69,8 @@ object App003 {
             .map {
                 case (mid, items) => MovieRecs(mid, items.toList.sortWith(_._2 > _._2)
                     .map(x => Recommendation(x._1, x._2)))
-            }.toDS()
-        movieRecsDS.foreach { movieRecs =>
-            val rowKey = movieRecs.mid.toString
-            movieRecs.recs.foreach { item =>
-                val mid = item.mid.toString
-                val score = item.score.toString
-                HBaseUtil.addRowData(OFFLINE_MOVIE_TABLE_NAME, rowKey, MOVIE_CONTENTS_RECS_COLUMN_FAMILY, mid, score)
             }
-        }
+        movieContentsMatrixRDD.saveToEs(MOVIE_CONTENTS_RECS_COLUMN_FAMILY)
 
         spark.stop()
     }
