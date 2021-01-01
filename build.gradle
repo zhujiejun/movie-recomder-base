@@ -38,11 +38,12 @@ subprojects {
         log4jVersion = '1.2.17'
         slf4jversion = '1.7.30'
         redisVersion = '3.4.0'
-        scalaVersion = '2.12.10'
+        scalaVersion = '2.11.12'
         jblasVersion = '1.2.5'
         kafkaVersion = '2.5.0'
         hbaseVersion = '2.2.5'
-        sparkVersion = '3.0.0'
+        sparkVersion = '2.4.5'
+        elasticVersion = '7.8.0'
         guavaVersion = '29.0-jre'
         lombokVersion = '1.18.16'
     }
@@ -50,14 +51,9 @@ subprojects {
     dependencies {
         testImplementation "junit:junit:${junitVersion}"
         implementation "org.slf4j:slf4j-log4j12:${slf4jversion}"
-        implementation "com.google.guava:guava:${guavaVersion}"
+        //implementation "com.google.guava:guava:${guavaVersion}"
         compileOnly "org.projectlombok:lombok:${lombokVersion}"
         annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-
-        // implementation "log4j:log4j:${log4j.version}"
-        // implementation "org.slf4j:jcl-over-slf4j:${slf4j.version}"
-        // implementation "org.slf4j:slf4j-api:${slf4j.version}"
-        // implementation "org.slf4j:slf4j-log4j12:${slf4j.version}"
     }
 
     dependencyManagement {
@@ -65,16 +61,16 @@ subprojects {
             dependency "org.jblas:jblas:${jblasVersion}"
             dependency "redis.clients:jedis:${redisVersion}"
             dependency "org.scala-lang:scala-library:${scalaVersion}"
-            dependency "org.apache.hbase:hbase-server:${hbaseVersion}"
-            dependency "org.apache.hbase:hbase-client:${hbaseVersion}"
-            dependency "org.apache.spark:spark-core_2.12:${sparkVersion}"
-            dependency "org.apache.spark:spark-sql_2.12:${sparkVersion}"
-            dependency "org.apache.spark:spark-streaming_2.12:${sparkVersion}"
-            dependency "org.apache.spark:spark-mllib_2.12:${sparkVersion}"
-            dependency "org.apache.spark:spark-graphx_2.12:${sparkVersion}"
             dependency "org.apache.kafka:kafka-clients:${kafkaVersion}"
             dependency "org.apache.kafka:kafka-streams:${kafkaVersion}"
-            dependency "org.apache.spark:spark-streaming-kafka-0-10_2.12:${sparkVersion}"
+            dependency "org.apache.spark:spark-core_2.11:${sparkVersion}"
+            dependency "org.apache.spark:spark-sql_2.11:${sparkVersion}"
+            dependency "org.apache.spark:spark-streaming_2.11:${sparkVersion}"
+            dependency "org.apache.spark:spark-mllib_2.11:${sparkVersion}"
+            dependency "org.apache.spark:spark-graphx_2.11:${sparkVersion}"
+            dependency "org.apache.spark:spark-streaming-kafka-0-10_2.11:${sparkVersion}"
+            dependency "org.elasticsearch.client:transport:${elasticVersion}"
+            dependency "org.elasticsearch:elasticsearch-spark-20_2.11:${elasticVersion}"
         }
     }
 }
