@@ -101,6 +101,7 @@ object App005 {
             (rating.uid.toInt, rating.mid.toInt)
         }.collect()
 
+        //取相似度矩阵
         //EsSparkSQL.esDF(spark, MOVIE_CONTENTS_RECS_INDEX)
         val simMovieMatrix = EsSparkSQL.esDF(spark, MOVIE_CONTENTS_RECS_INDEX).as[MovieRecs].rdd.map { movieRecs =>
             (movieRecs.mid.toInt, movieRecs.recs.map(x => (x.mid.toInt, x.score)).toMap) //为了查询相似度方便,转换成map
