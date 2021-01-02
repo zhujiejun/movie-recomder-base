@@ -2,12 +2,12 @@ project(':service-003') {
     dependencies {
         implementation 'org.jblas:jblas'
         implementation project(':service-000')
-        implementation 'org.scala-lang:scala-library'
         implementation 'org.apache.spark:spark-core_2.11'
         implementation 'org.apache.spark:spark-sql_2.11'
         implementation 'org.apache.spark:spark-mllib_2.11'
         implementation 'org.elasticsearch.client:transport'
         implementation 'org.elasticsearch:elasticsearch-spark-20_2.11'
+        implementation 'org.scala-lang:scala-library:2.11.12'
     }
 }
 mainClassName = 'com.zhujiejun.recomder.App003'

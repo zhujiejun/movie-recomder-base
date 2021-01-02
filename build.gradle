@@ -43,6 +43,7 @@ subprojects {
         kafkaVersion = '2.5.0'
         hbaseVersion = '2.2.5'
         sparkVersion = '2.4.5'
+        jacksonVersion = '2.9.8'
         elasticVersion = '7.8.0'
         guavaVersion = '29.0-jre'
         lombokVersion = '1.18.16'
@@ -54,13 +55,15 @@ subprojects {
         //implementation "com.google.guava:guava:${guavaVersion}"
         compileOnly "org.projectlombok:lombok:${lombokVersion}"
         annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+        implementation "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
+
     }
 
     dependencyManagement {
         dependencies {
             dependency "org.jblas:jblas:${jblasVersion}"
             dependency "redis.clients:jedis:${redisVersion}"
-            dependency "org.scala-lang:scala-library:${scalaVersion}"
+            //dependency "org.scala-lang:scala-library:${scalaVersion}"
             dependency "org.apache.kafka:kafka-clients:${kafkaVersion}"
             dependency "org.apache.kafka:kafka-streams:${kafkaVersion}"
             dependency "org.apache.spark:spark-core_2.11:${sparkVersion}"
