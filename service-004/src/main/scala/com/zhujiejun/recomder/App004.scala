@@ -18,7 +18,7 @@ object App004 {
         import spark.implicits._
         val ratingRDD = EsSparkSQL.esDF(spark, ORIGINAL_RATING_INDEX).as[Rating].rdd.map { rating =>
             (rating.uid.toInt, rating.mid.toInt, rating.score) //转化成rdd,并且去掉时间戳
-        } /*.cache()*/
+        }.cache()
 
         //训练隐语义模型
         val trainData = ratingRDD.map(x => MLRating(x._1, x._2, x._3))

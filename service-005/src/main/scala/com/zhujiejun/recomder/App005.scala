@@ -4,7 +4,6 @@ import com.zhujiejun.recomder.cons.Const._
 import com.zhujiejun.recomder.data._
 import com.zhujiejun.recomder.util.ConnHelper
 import org.apache.spark.SparkConf
-import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.kafka010.{ConsumerStrategies, KafkaUtils, LocationStrategies}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
@@ -25,15 +24,15 @@ object App005 {
     }
 
     def getTopSimMovies(num: Int, mid: Int, uid: Int, simMovies: scala.collection.Map
-        [Int, scala.collection.immutable.Map[Int, Double]])(implicit ratings: RDD[Rating]): Array[Int] = {
+        [Int, scala.collection.immutable.Map[Int, Double]])(implicit ratings: Array[(Int, Int)]): Array[Int] = {
         //1.从相似度矩阵中拿到所有相似的电影
         val allSimMovies = simMovies(mid).toArray
         //2.从HBase中查询用户已看过的电影
         val ratingExist = ratings.filter { rating =>
-            rating.uid == uid
+            rating._1 == uid
         }.map { item =>
-            item.mid.toInt
-        }.collect()
+            item._2.toInt
+        }
         //3.把看过的过滤,得到输出列表
         allSimMovies.filter(x => !ratingExist.contains(x._1))
             .sortWith(_._2 > _._2)
@@ -99,11 +98,14 @@ object App005 {
 
         import spark.implicits._
         //查询用户已看过的电影
-        implicit val ratings: RDD[Rating] = EsSparkSQL.esDF(spark, ORIGINAL_RATING_INDEX).as[Rating].rdd
+        implicit val ratings: Array[(Int, Int)] = EsSparkSQL.esDF(spark, ORIGINAL_RATING_INDEX).as[Rating].limit(1000).rdd.map { rating =>
+            (rating.uid.toInt, rating.mid.toInt)
+        }.collect()
+        /*.cache()*/
         //EsSparkSQL.esDF(spark, MOVIE_CONTENTS_RECS_INDEX)
-        val simMovieMatrix = EsSparkSQL.esDF(spark, MOVIE_FEATURES_RECS_INDEX).as[MovieRecs].rdd.map { movieRecs =>
+        val simMovieMatrix = EsSparkSQL.esDF(spark, MOVIE_FEATURES_RECS_INDEX).as[MovieRecs].limit(1000).rdd.map { movieRecs =>
             (movieRecs.mid.toInt, movieRecs.recs.map(x => (x.mid.toInt, x.score)).toMap) //为了查询相似度方便,转换成map
-        }.collectAsMap()
+        } /*.cache()*/ .collectAsMap()
 
         //加载电影相似度矩阵数据,把它广播出去
         val simMovieMatrixBroadCast = sparkContext.broadcast(simMovieMatrix)
