@@ -11,4 +11,4 @@ import org.apache.spark.rdd.RDD
  * 1260759144
  */
 @SerialVersionUID(1002L)
-case class Rating(uid: Int, mid: Int, score: Double, timestamp: Int) extends Serializable
+case class Rating(uid: BigInt, mid: BigInt, score: Double, timestamp: BigInt) extends Serializable

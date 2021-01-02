@@ -12,15 +12,10 @@ object ConnHelper extends Serializable {
     lazy val jedis = new JedisCluster(new HostAndPort(REDIS_HOST, REDIS_PORT.toInt))
 
     def main(args: Array[String]): Unit = {
-        val sparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_005_NAME)
-        sparkConf
-            .set("spark.driver.cores", "6")
-            .set("spark.driver.memory", "512m")
-            .set("spark.executor.cores", "6")
-            .set("spark.executor.memory", "512m")
-            .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+        val sparkConfig = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_005_NAME)
+        sparkConfig.setAll(SPARK_PARAM).setAll(ELASTICS_PARAM)
             .registerKryoClasses(Array(classOf[MovieSearch], classOf[RatingSearch], classOf[TagSearch]))
-        val spark = SparkSession.builder().config(sparkConf).getOrCreate()
+        val spark = SparkSession.builder().config(sparkConfig).getOrCreate()
 
         import spark.implicits._
         val fileRDD = spark.sparkContext.textFile("hdfs://node101:9000/sfb/recomder/redis/redis-data.txt")

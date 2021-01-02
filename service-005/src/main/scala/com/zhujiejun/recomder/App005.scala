@@ -19,13 +19,13 @@ object App005 {
         //从redis读取数据,用户评分数据保存在 uid:UID 为key的队列里,value是 MID:SCORE
         jedis.lrange("uid:" + uid, 0, num - 1)
             .map { item => //具体每个评分又是以冒号分隔的两个值
-                val attr = item.split("\\:")
+                val attr = item.split(":")
                 (attr(0).trim.toInt, attr(1).trim.toDouble)
             }.toArray
     }
 
     def getTopSimMovies(num: Int, mid: Int, uid: Int, simMovies: scala.collection.Map
-        [Int, scala.collection.immutable.Map[Int, Double]], ratings: RDD[Rating]): Array[Int] = {
+        [Int, scala.collection.immutable.Map[Int, Double]])(implicit ratings: RDD[Rating]): Array[Int] = {
         //1.从相似度矩阵中拿到所有相似的电影
         val allSimMovies = simMovies(mid).toArray
         //2.从HBase中查询用户已看过的电影
@@ -91,22 +91,18 @@ object App005 {
 
     def main(args: Array[String]): Unit = {
         val sparkConfig: SparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_005_NAME)
-        sparkConfig
-            .setAll(ELASTICS_PARAM)
-            .set("spark.driver.cores", "6")
-            .set("spark.driver.memory", "1g ")
-            .set("spark.executor.cores", "6")
-            .set("spark.executor.memory", "2g")
-            .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+        sparkConfig.setAll(SPARK_PARAM).setAll(ELASTICS_PARAM)
             .registerKryoClasses(Array(classOf[MovieSearch], classOf[RatingSearch], classOf[TagSearch]))
         val spark = SparkSession.builder().config(sparkConfig).getOrCreate()
         val sparkContext = spark.sparkContext
         val streamingContext = new StreamingContext(sparkContext, Seconds(2))
 
         import spark.implicits._
+        //查询用户已看过的电影
+        implicit val ratings: RDD[Rating] = EsSparkSQL.esDF(spark, ORIGINAL_RATING_INDEX).as[Rating].rdd
         //EsSparkSQL.esDF(spark, MOVIE_CONTENTS_RECS_INDEX)
-        val simMovieMatrix = EsSparkSQL.esDF(spark, MOVIE_FEATURES_RECS_INDEX).as[MovieRecs].rdd.map { movieRecs => //为了查询相似度方便,转换成map
-            (movieRecs.mid, movieRecs.recs.map(x => (x.mid, x.score)).toMap)
+        val simMovieMatrix = EsSparkSQL.esDF(spark, MOVIE_FEATURES_RECS_INDEX).as[MovieRecs].rdd.map { movieRecs =>
+            (movieRecs.mid.toInt, movieRecs.recs.map(x => (x.mid.toInt, x.score)).toMap) //为了查询相似度方便,转换成map
         }.collectAsMap()
 
         //加载电影相似度矩阵数据,把它广播出去
@@ -124,19 +120,17 @@ object App005 {
             rdds.foreach {
                 case (uid, mid, score, timestamp) =>
                     println("rating data coming! >>>>>>>>>>>>>>>>")
-                    //1.从redis里获取当前用户最近的K次评分,保存成Array[(mid, score)]
+                    //1.从Redis里获取当前用户最近的K次评分,保存成Array[(mid, score)]
                     val userRecentlyRatings = getUserRecentlyRating(MAX_USER_RATINGS_NUM, uid, ConnHelper.jedis)
-                    //2.查询用户已看过的电影
-                    val ratings = EsSparkSQL.esDF(spark, ORIGINAL_RATING_INDEX).as[Rating].rdd
                     //2.从相似度矩阵中取出当前电影最相似的N个电影,作为备选列表,Array[mid]
-                    val candidateMovies = getTopSimMovies(MAX_SIM_MOVIES_NUM, mid, uid, simMovieMatrixBroadCast.value, ratings)
+                    val candidateMovies = getTopSimMovies(MAX_SIM_MOVIES_NUM, mid, uid, simMovieMatrixBroadCast.value)
                     //3.对每个备选电影,计算推荐优先级,得到当前用户的实时推荐列表,Array[(mid, score)]
                     val streamRecs = computeMovieScores(candidateMovies, userRecentlyRatings, simMovieMatrixBroadCast.value)
                     //4.把推荐数据保存到Elastic
                     val recs = streamRecs.map {
                         case (mid, score) => Recommendation(mid, score)
                     }.toSeq
-                    sparkContext.makeRDD(Seq(UserRecs(uid, recs))).saveToEs(STREAM_USER_RECS_INDEX)
+                    recs.toDF().rdd.saveToEs(STREAM_USER_RECS_INDEX)
             }
         }
         //开始接收和处理数据

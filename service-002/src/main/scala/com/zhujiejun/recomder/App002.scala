@@ -13,13 +13,7 @@ import org.jblas.DoubleMatrix
 object App002 {
     def main(args: Array[String]): Unit = {
         val sparkConfig: SparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_002_NAME)
-        sparkConfig
-            .setAll(ELASTICS_PARAM)
-            .set("spark.driver.cores", "6")
-            .set("spark.driver.memory", "512m")
-            .set("spark.executor.cores", "6")
-            .set("spark.executor.memory", "2g")
-            .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+        sparkConfig.setAll(SPARK_PARAM).setAll(ELASTICS_PARAM)
             .registerKryoClasses(Array(classOf[MovieSearch], classOf[RatingSearch], classOf[TagSearch]))
         val spark = SparkSession.builder().config(sparkConfig).getOrCreate()
 

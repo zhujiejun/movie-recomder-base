@@ -5,11 +5,20 @@ import org.apache.kafka.common.serialization.StringDeserializer
 object Const {
     val CONFIG = Map(
         "spark.cores" -> "local[*]",
-        "kafka.from.topic" -> "sfb_recomder_log",
-        "kafka.to.topic" -> "sfb_recomder",
+        "zookeepers" -> "node101:2181",
         "kafka.brokers" -> "node101:9092",
-        "zookeepers" -> "node101:2181"
+        "kafka.from.topic" -> "sfb_recomder_log",
+        "kafka.to.topic" -> "sfb_recomder"
     )
+
+    val SPARK_PARAM: Array[(String, String)] = Map(
+        "spark.driver.cores" -> "6",
+        "spark.driver.memory" -> "1g ",
+        "spark.executor.cores" -> "6",
+        "spark.executor.memory" -> "2g",
+        "spark.kryoserializer.buffer.max" -> "128m",
+        "spark.serializer" -> "org.apache.spark.serializer.KryoSerializer"
+    ).toArray
 
     val KAFKA_PARAM = Map(
         "group.id" -> "recommender",
@@ -24,7 +33,8 @@ object Const {
         "es.nodes.wan.only" -> "true",
         "es.index.auto.create" -> "true",
         //"es.mapping.id" -> "zip_record_id",
-        "es.nodes" -> "node101,node102,node103"
+        "es.nodes" -> "node101,node102,node103",
+        "es.read.field.as.array.include" -> "recs"
     ).toArray
 
     val YEAR_MONTH_PATTERN = "yyyyMM"

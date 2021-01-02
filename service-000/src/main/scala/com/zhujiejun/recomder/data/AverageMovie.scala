@@ -1,3 +1,4 @@
 package com.zhujiejun.recomder.data
 
-case class AverageMovie(mid: Int, avg: Double)
+@SerialVersionUID(1006L)
+case class AverageMovie(mid: BigInt, avg: Double) extends Serializable

@@ -1,3 +1,4 @@
 package com.zhujiejun.recomder.data
 
-case class RateMoreMovie(mid: Int, count: Long)
+@SerialVersionUID(1004L)
+case class RateMoreMovie(mid: BigInt, count: BigInt) extends Serializable

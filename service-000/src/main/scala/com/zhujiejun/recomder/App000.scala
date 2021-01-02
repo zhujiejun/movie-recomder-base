@@ -8,16 +8,10 @@ import org.elasticsearch.spark.sparkRDDFunctions
 
 object App000 {
     def main(args: Array[String]): Unit = {
-        val sparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_000_NAME)
-        sparkConf
-            .setAll(ELASTICS_PARAM)
-            .set("spark.driver.cores", "6")
-            .set("spark.driver.memory", "512m")
-            .set("spark.executor.cores", "6")
-            .set("spark.executor.memory", "2g")
-            .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+        val sparkConfig: SparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_000_NAME)
+        sparkConfig.setAll(SPARK_PARAM).setAll(ELASTICS_PARAM)
             .registerKryoClasses(Array(classOf[MovieSearch], classOf[RatingSearch], classOf[TagSearch]))
-        val spark = SparkSession.builder().config(sparkConf).getOrCreate()
+        val spark = SparkSession.builder().config(sparkConfig).getOrCreate()
         val movie = spark.sparkContext.textFile(MOVIE_DATA_PATH)
         val movieRDD = movie.map { item => {
             val attr = item.split("\\^")
