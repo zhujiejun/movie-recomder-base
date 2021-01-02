@@ -7,7 +7,6 @@ import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.kafka010.{ConsumerStrategies, KafkaUtils, LocationStrategies}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
-import org.elasticsearch.spark.sparkRDDFunctions
 import org.elasticsearch.spark.sql.EsSparkSQL
 import redis.clients.jedis.JedisCluster
 
@@ -27,7 +26,7 @@ object App005 {
         [Int, scala.collection.immutable.Map[Int, Double]])(implicit ratings: Array[(Int, Int)]): Array[Int] = {
         //1.从相似度矩阵中拿到所有相似的电影
         val allSimMovies = simMovies(mid).toArray
-        //2.从HBase中查询用户已看过的电影
+        //2.查询用户已看过的电影
         val ratingExist = ratings.filter { rating =>
             rating._1 == uid
         }.map { item =>
@@ -98,14 +97,14 @@ object App005 {
 
         import spark.implicits._
         //查询用户已看过的电影
-        implicit val ratings: Array[(Int, Int)] = EsSparkSQL.esDF(spark, ORIGINAL_RATING_INDEX).as[Rating].limit(1000).rdd.map { rating =>
+        implicit val ratings: Array[(Int, Int)] = EsSparkSQL.esDF(spark, ORIGINAL_RATING_INDEX).as[Rating].rdd.map { rating =>
             (rating.uid.toInt, rating.mid.toInt)
         }.collect()
-        /*.cache()*/
+
         //EsSparkSQL.esDF(spark, MOVIE_CONTENTS_RECS_INDEX)
-        val simMovieMatrix = EsSparkSQL.esDF(spark, MOVIE_FEATURES_RECS_INDEX).as[MovieRecs].limit(1000).rdd.map { movieRecs =>
+        val simMovieMatrix = EsSparkSQL.esDF(spark, MOVIE_CONTENTS_RECS_INDEX).as[MovieRecs].rdd.map { movieRecs =>
             (movieRecs.mid.toInt, movieRecs.recs.map(x => (x.mid.toInt, x.score)).toMap) //为了查询相似度方便,转换成map
-        } /*.cache()*/ .collectAsMap()
+        }.collectAsMap()
 
         //加载电影相似度矩阵数据,把它广播出去
         val simMovieMatrixBroadCast = sparkContext.broadcast(simMovieMatrix)
@@ -132,7 +131,8 @@ object App005 {
                     val recs = streamRecs.map {
                         case (mid, score) => Recommendation(mid, score)
                     }.toSeq
-                    recs.toDF().rdd.saveToEs(STREAM_USER_RECS_INDEX)
+                    List(UserRecs(uid, recs)).toDF().show()
+                //List(UserRecs(uid, recs)).toDF().rdd.saveToEs(STREAM_USER_RECS_INDEX)
             }
         }
         //开始接收和处理数据
