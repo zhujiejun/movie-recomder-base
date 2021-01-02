@@ -15,7 +15,7 @@ object App003 {
     def main(args: Array[String]): Unit = {
         val sparkConfig: SparkConf = new SparkConf().setMaster(CONFIG("spark.cores")).setAppName(SERVICE_005_NAME)
         sparkConfig.setAll(SPARK_PARAM).setAll(ELASTICS_PARAM)
-            .registerKryoClasses(Array(classOf[MovieSearch], classOf[RatingSearch], classOf[TagSearch])))
+            .registerKryoClasses(Array(classOf[MovieSearch], classOf[RatingSearch], classOf[TagSearch]))
         val spark = SparkSession.builder().config(sparkConfig).getOrCreate()
 
         import spark.implicits._

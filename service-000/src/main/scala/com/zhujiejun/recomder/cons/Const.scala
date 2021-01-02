@@ -13,10 +13,10 @@ object Const {
 
     val SPARK_PARAM: Array[(String, String)] = Map(
         "spark.driver.cores" -> "6",
-        "spark.driver.memory" -> "1g ",
+        "spark.driver.memory" -> "512m",
         "spark.executor.cores" -> "6",
         "spark.executor.memory" -> "2g",
-        "spark.kryoserializer.buffer.max" -> "128m",
+        "spark.kryoserializer.buffer.max" -> "256m",
         "spark.serializer" -> "org.apache.spark.serializer.KryoSerializer"
     ).toArray
 
