@@ -1,10 +1,10 @@
 package com.zhujiejun.recomder.util
 
 import com.zhujiejun.recomder.cons.Const._
-import com.zhujiejun.recomder.data.{MovieSearch, RatingSearch, TagSearch}
+import com.zhujiejun.recomder.data._
 import org.apache.spark.SparkConf
-import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
+import org.elasticsearch.spark.sql.EsSparkSQL
 import redis.clients.jedis.{HostAndPort, JedisCluster}
 
 import java.sql.Timestamp
@@ -39,14 +39,20 @@ object ConnHelper extends Serializable {
             jedis.lpush(key, value)
             println(s"---------$key=$value----------")
         }*/
-        import spark.implicits._
-        val fileRDD = spark.sparkContext.textFile(path0)
+
+        /*val fileRDD = spark.sparkContext.textFile(path0)
         val wordRDD: RDD[String] = fileRDD.flatMap(_.split(" "))
         wordRDD.map { line =>
             val row = line.split("\\|")
             //println(s"------the data is ${row(0)},${row(1)},${row(2)}------")
             row(0) + "|" + row(1) + "|" + (Math.random() * 10).formatted("%.1f") + "|" + randomTimestamp()
-        }.repartition(1).saveAsTextFile(path1)
+        }.repartition(1).saveAsTextFile(path1)*/
+
+        import spark.implicits._
+        //val userRecs = Seq(UserRecs(BigInt(477362), Seq(Recommendation(BigInt(8478323), 0.7962d))))
+        val userRecs = Seq((1000, Seq((1000, 0.7732d), (1001, 0.4237d))))
+        userRecs.toDS().printSchema()
+        EsSparkSQL.saveToEs(userRecs.toDS(), STREAM_USER_RECS_INDEX)
 
         spark.close()
     }

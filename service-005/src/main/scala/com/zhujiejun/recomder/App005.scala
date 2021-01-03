@@ -117,9 +117,10 @@ object App005 {
             val attr = msg.value().split("\\|")
             (attr(0).toInt, attr(1).toInt, attr(2).toDouble, attr(3).toInt)
         }
-        //继续做流式处理,核心实时算法部分
+
+        //流式处理,核心实时算法部分
         ratingStream.foreachRDD { rdds =>
-            rdds.foreach {
+            val userRecses = rdds.map {
                 case (uid, mid, score, timestamp) =>
                     println("rating data coming! >>>>>>>>>>>>>>>>")
                     //1.从Redis里获取当前用户最近的K次评分,保存成Array[(mid, score)]
@@ -132,10 +133,12 @@ object App005 {
                     val recs = streamRecs.map {
                         case (mid, score) => Recommendation(mid, score)
                     }.toSeq
-                    List(UserRecs(uid, recs)).toDF().show()
-                //List(UserRecs(uid, recs)).toDF().rdd.saveToEs(STREAM_USER_RECS_INDEX)
+                    UserRecs(uid, recs)
             }
+            userRecses.toDS().printSchema()
+            EsSparkSQL.saveToEs(userRecses.toDS(), STREAM_USER_RECS_INDEX)
         }
+
         //开始接收和处理数据
         streamingContext.start()
         println(">>>>>>>>>>>>>>> streaming started!")
