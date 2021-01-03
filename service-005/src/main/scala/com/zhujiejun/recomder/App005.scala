@@ -7,6 +7,7 @@ import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.kafka010.{ConsumerStrategies, KafkaUtils, LocationStrategies}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
+import org.elasticsearch.spark.sparkRDDFunctions
 import org.elasticsearch.spark.sql.EsSparkSQL
 import redis.clients.jedis.JedisCluster
 
@@ -135,8 +136,9 @@ object App005 {
                     }.toSeq
                     UserRecs(uid, recs)
             }
-            userRecses.toDS().printSchema()
-            EsSparkSQL.saveToEs(userRecses.toDS(), STREAM_USER_RECS_INDEX)
+            //userRecses.toDS().printSchema()
+            //EsSparkSQL.saveToEs(userRecses.toDS(), STREAM_USER_RECS_INDEX)
+            userRecses.saveToEs(STREAM_USER_RECS_INDEX)
         }
 
         //开始接收和处理数据

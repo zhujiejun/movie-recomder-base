@@ -4,10 +4,10 @@ import com.zhujiejun.recomder.cons.Const._
 import com.zhujiejun.recomder.data._
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
-import org.elasticsearch.spark.sql.EsSparkSQL
 import redis.clients.jedis.{HostAndPort, JedisCluster}
 
 import java.sql.Timestamp
+import java.time.LocalDateTime
 
 //定义连接助手对象,序列化
 object ConnHelper extends Serializable {
@@ -18,7 +18,7 @@ object ConnHelper extends Serializable {
 
     def randomTimestamp(): String = {
         val beg = Timestamp.valueOf("2012-01-01 00:00:00").getTime
-        val end = Timestamp.valueOf("2020-12-31 23:59:59").getTime
+        val end = Timestamp.valueOf(LocalDateTime.now()).getTime
         val diff = end - beg + 1
         new Timestamp(beg + (Math.random * diff).toLong).getTime.toString
     }
@@ -49,10 +49,10 @@ object ConnHelper extends Serializable {
         }.repartition(1).saveAsTextFile(path1)*/
 
         import spark.implicits._
-        //val userRecs = Seq(UserRecs(BigInt(477362), Seq(Recommendation(BigInt(8478323), 0.7962d))))
-        val userRecs = Seq((1000, Seq((1000, 0.7732d), (1001, 0.4237d))))
+        //val userRecs = Seq((1000, Seq((1000, 0.7732d), (1001, 0.4237d))))
+        val userRecs = Seq(UserRecs(BigInt(477362), Seq(Recommendation(BigInt(8478323), 0.7962d))))
         userRecs.toDS().printSchema()
-        EsSparkSQL.saveToEs(userRecs.toDS(), STREAM_USER_RECS_INDEX)
+        //EsSparkSQL.saveToEs(userRecs.toDS(), STREAM_USER_RECS_INDEX)
 
         spark.close()
     }
